@@ -115,7 +115,11 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   }
   async function handle(req){
     const url=new URL(req.url);
-    if(url.origin!==originUrl)return withHeaders(json({error:'Host not allowed'},421),secure);
+    // In production the reverse proxy must retain the original public Host.
+    // Never trust an arbitrary Host to initiate an OAuth flow or read owner state.
+    const suppliedHost=req.headers.get('host');
+    if(url.origin!==originUrl || (suppliedHost && suppliedHost.toLowerCase()!==parsed.host.toLowerCase()))
+      return withHeaders(json({error:'Host not allowed'},421),secure);
     const path=url.pathname;prune();
     if(req.method==='GET'&&path==='/health')return withHeaders(json({ok:true,service:'NEXO read-only gateway',version:'0.8-local-candidate'}),secure);
     if(req.method==='GET'&&path==='/auth/login'){
@@ -161,13 +165,27 @@ if(process.argv[1] && import.meta.url===new URL('file://'+process.argv[1]).href)
   const missing=required.filter(k=>!process.env[k]);
   if(missing.length){console.error('Refused to start. Configure privately:',missing.join(', '));process.exit(1)}
   const gateway=createGitHubGateway({origin,githubClientId:process.env.GITHUB_OAUTH_CLIENT_ID,githubClientSecret:process.env.GITHUB_OAUTH_CLIENT_SECRET,ownerGitHubId:process.env.GITHUB_OWNER_ID,railwayToken:process.env.RAILWAY_PROJECT_TOKEN||null,projectId:process.env.RAILWAY_PROJECT_ID,environmentId:process.env.RAILWAY_ENVIRONMENT_ID,privateHealth:process.env.NEXO_PRIVATE_RAILWAY_HEALTH==='1'});
-  const {hostname,port}=new URL(origin);const listenPort=Number(process.env.PORT||port||443);
+  const {hostname,port,protocol}=new URL(origin);
+  const listenPort=Number(process.env.PORT||port||443);
+  if(!Number.isInteger(listenPort)||listenPort<1||listenPort>65535)throw Error('Invalid listening port');
+  // Railway terminates TLS at its HTTPS edge and connects over an internal HTTP port.
+  // The public DNS name is not a local network interface, so listen on 0.0.0.0.
+  const listenHost=protocol==='https:'?'0.0.0.0':hostname;
   createServer(async(req,res)=>{
     try{
+      const host=String(req.headers.host||'');
+      if(host.toLowerCase()!==new URL(origin).host.toLowerCase()){
+        res.writeHead(421,{'Content-Type':'application/json','Cache-Control':'no-store'});
+        res.end('{"error":"Host not allowed"}');return;
+      }
+      if(typeof req.url!=='string'||!req.url.startsWith('/')||req.url.startsWith('//')){
+        res.writeHead(400,{'Content-Type':'application/json','Cache-Control':'no-store'});
+        res.end('{"error":"Invalid path"}');return;
+      }
       const full=new Request(origin+req.url,{method:req.method,headers:req.headers});
       const response=await gateway.handle(full);const headers=Object.fromEntries(response.headers.entries());
       const setCookies=response.headers.getSetCookie?.();if(setCookies?.length)headers['set-cookie']=setCookies;
       res.writeHead(response.status,headers);res.end(Buffer.from(await response.arrayBuffer()));
     }catch{res.writeHead(500,{'Content-Type':'text/plain','Cache-Control':'no-store'});res.end('Internal error')}
-  }).listen(listenPort, hostname,()=>console.log(`NEXO read-only gateway listening at ${origin} (OAuth owner-only; no write routes)`));
+  }).listen(listenPort, listenHost,()=>console.log(`NEXO read-only gateway configured for ${origin} (binding ${listenHost}:${listenPort}, OAuth owner-only; no write routes)`));
 }
