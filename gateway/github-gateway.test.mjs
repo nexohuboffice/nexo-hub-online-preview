@@ -93,9 +93,9 @@ test('12 expected names returned including MISSING without inventing status',asy
  const m=setup({shortInventory:true}),x=await m.login();const resp=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));const data=await resp.json();assert.equal(data.services.length,12);assert.equal(data.services.filter(x=>x.deployment==='MISSING').length,8);
 });
 test('optional private health probes never expose internal /health secrets',async()=>{
- const m=setup({health:true,failHealth:'nexo-comms'}),x=await m.login();const resp=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));const data=await resp.json();assert.equal(m.countHealth(),9);
+ const m=setup({health:true,failHealth:'nexo-comms'}),x=await m.login();const resp=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));const data=await resp.json();assert.equal(m.countHealth(),8);
  assert.equal(data.services.find(x=>x.id==='nexo-comms').state,'unreachable');assert.equal(data.services.find(x=>x.id==='nexo-discord').state,'online');
- assert.equal(data.services.filter(x=>x.state==='not_monitored').length,3);
+ assert.equal(data.services.filter(x=>x.state==='not_monitored').length,4);
  assert.ok(!JSON.stringify(data).includes('SHOULD_NEVER_LEAK'));
 });
 test('status cached for 20s and refetched after TTL',async()=>{
@@ -147,15 +147,15 @@ test('owner session cookies use secure __Host- prefix under HTTPS',async()=>{
   assert.match(response.headers.get('strict-transport-security'),/max-age=/);
 });
 
-test('token-free private health mode probes 9 fixed services and no Railway API',async()=>{
+test('token-free private health mode probes 8 fixed services and no Railway API',async()=>{
  const m=setup({health:true,noToken:true}),x=await m.login();
  const r=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));
  assert.equal(r.status,200);const data=await r.json();
  assert.equal(data.services.length,12);
- assert.equal(data.services.filter(s=>s.state==='online').length,9);
- assert.equal(data.services.filter(s=>s.state==='not_monitored').length,3);
+ assert.equal(data.services.filter(s=>s.state==='online').length,8);
+ assert.equal(data.services.filter(s=>s.state==='not_monitored').length,4);
  assert.equal(data.services.filter(s=>s.deployment==='UNKNOWN').length,12);
- assert.equal(m.countHealth(),9);
+ assert.equal(m.countHealth(),8);
  assert.equal(m.calls.filter(c=>c.url.includes('backboard.railway.com')).length,0);
 });
 test('token-free private health mode safely distinguishes failed probes',async()=>{
@@ -164,4 +164,12 @@ test('token-free private health mode safely distinguishes failed probes',async()
  assert.equal(r.status,200);const data=await r.json();
  assert.equal(data.services.find(s=>s.id==='nexo-browser').state,'unreachable');
  assert.equal(data.services.find(s=>s.id==='nexo-eve-ipad-radar').state,'not_monitored');
+});
+
+test('one-off IMMO bootstrap is never treated as an HTTP service',async()=>{
+ const m=setup({health:true,noToken:true}),x=await m.login();
+ const r=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));
+ const data=await r.json();
+ assert.equal(data.services.find(s=>s.id==='immo-discord-bootstrap').state,'not_monitored');
+ assert.equal(m.calls.filter(c=>c.url.includes('immo-discord-bootstrap.railway.internal')).length,0);
 });
