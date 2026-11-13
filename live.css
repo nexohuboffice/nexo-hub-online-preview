@@ -1,0 +1,7 @@
+.live-panel{margin:24px 0;border:1px solid #6be4d855;padding:24px;border-radius:16px;background:#0e1c2b}
+.live-panel h2{margin:0 0 10px}.live-panel p{margin:10px 0 18px}
+.live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:12px;margin-top:18px}
+.live-service{border:1px solid #ffffff16;border-radius:10px;padding:14px;overflow-wrap:anywhere}
+.live-service strong,.live-service small{display:block;letter-spacing:0}.live-service span{display:block;margin:8px 0;color:#9ce5e0}
+.live-panel .live-note{font-size:12px;color:#aebdd0}.live-panel [role=alert]{color:#ffc687}
+.live-panel button,.live-panel a{margin-right:8px}.live-panel .live-metrics{font-size:15px;color:#dbf6ff}
