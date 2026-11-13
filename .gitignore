@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+# Private gateway is delivered separately, never through this public repository.
+gateway/
+DEPLOYMENT.txt
+tests/security.test.mjs
+coverage/
+*.log
