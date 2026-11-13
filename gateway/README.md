@@ -47,3 +47,18 @@ Sem token, o login pode ser testado, mas `/api/status` devolve HTTP 503 (não co
 - Falta auditoria de segurança independente, logs de acesso minimizados, alertas, testes OAuth reais e recuperação de falhas no navegador.
 - Não servir nem injetar HTML mutável do GitHub Pages na origem com cookies autenticados sem uma auditoria de XSS, CSP e bundle versionado.
 - Não foi publicado serviço no Railway, nem autorizados novos custos. CORE, COMMS, Discord, Voice e missões existentes não sofreram alterações.
+
+
+## Revisão de segurança adicional — 13/11/2026
+
+O candidato valida agora o **Host** recebido no pedido contra o domínio configurado e rejeita caminhos absolutos/começados por `//`. Em HTTPS, a escuta TCP usa `0.0.0.0:$PORT` por trás do proxy Railway, mantendo fixa a origem pública para OAuth e cookies. Em loopback continua a escutar só em `127.0.0.1`. Esta configuração **não substitui** validação num proxy de produção real.
+
+### Preferência atual: primeira leitura Live **sem Project Token**
+
+Se for aprovado um gateway privado dentro do mesmo ambiente Railway, a opção `NEXO_PRIVATE_RAILWAY_HEALTH=1` sem `RAILWAY_PROJECT_TOKEN` permite sondar apenas os nove endpoints `/health` privados de endereços fixos `<nome>.railway.internal:8080`, sem configurar nenhum token de projeto. Os três serviços cron permanecem `not_monitored` e o campo `deployment` aparece `UNKNOWN` porque o gateway **não consulta** a API Railway.
+
+**Limites:** este modo não funciona como verificação da produção a partir do PC local (o domínio interno só é resolvido dentro da rede privada Railway). É necessário validar as portas e respostas dos serviços, verificar autenticação e endurecimento do domínio HTTPS, e obter aprovação para qualquer novo serviço/custo antes de publicar. Não fazer merge para main nem criar serviço Railway nesta fase.
+
+### Provas executadas
+
+`npm test` — **23 testes aprovados**, incluindo HTTP real em `127.0.0.1` sem quaisquer segredos reais. Os fornecedores GitHub/Railway foram simulados; o login OAuth real e os serviços privados de Railway **não foram ensaiados**.
