@@ -121,3 +121,28 @@ test('no POST api routes, no CORS and no public PWA proxy',async()=>{
 test('without Railway token the owner receives 503 and no external requests',async()=>{
  const m=setup({noToken:true}),x=await m.login();const r=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));assert.equal(r.status,503);assert.equal(m.calls.some(x=>x.url.includes('backboard')),false);
 });
+
+
+test('Host header spoofing is rejected even with a valid-looking URL and session',async()=>{
+  const m=setup(),x=await m.login();
+  const spoofed=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie,Host:'evil.example.org'}));
+  assert.equal(spoofed.status,421);
+  const localHost=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie,Host:'127.0.0.1:8788'}));
+  assert.equal(localHost.status,200);
+});
+test('callback refuses an unexpected Host before contacting GitHub',async()=>{
+  const m=setup();const r=await m.g.handle(m.request('/auth/callback?code=x&state=y',{Host:'evil.example.org'}));
+  assert.equal(r.status,421);assert.equal(m.calls.length,0);
+});
+test('owner session cookies use secure __Host- prefix under HTTPS',async()=>{
+  const github='https://nexo-secure.example.org';
+  const params={origin:github,githubClientId:'test',githubClientSecret:'test-private',ownerGitHubId:owner,projectId,environmentId};
+  const g=createGitHubGateway(params,{http:async()=>{throw Error('outbound forbidden')}});
+  const response=await g.handle(new Request(github+'/auth/login',{headers:{Host:'nexo-secure.example.org'}}));
+  assert.equal(response.status,302);
+  assert.match(response.headers.get('set-cookie'),/__Host-nexo_oauth=/);
+  assert.match(response.headers.get('set-cookie'),/HttpOnly/);
+  assert.match(response.headers.get('set-cookie'),/Secure/);
+  assert.match(response.headers.get('set-cookie'),/Path=\//);
+  assert.match(response.headers.get('strict-transport-security'),/max-age=/);
+});
