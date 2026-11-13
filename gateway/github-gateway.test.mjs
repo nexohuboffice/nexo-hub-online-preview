@@ -146,3 +146,22 @@ test('owner session cookies use secure __Host- prefix under HTTPS',async()=>{
   assert.match(response.headers.get('set-cookie'),/Path=\//);
   assert.match(response.headers.get('strict-transport-security'),/max-age=/);
 });
+
+test('token-free private health mode probes 9 fixed services and no Railway API',async()=>{
+ const m=setup({health:true,noToken:true}),x=await m.login();
+ const r=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));
+ assert.equal(r.status,200);const data=await r.json();
+ assert.equal(data.services.length,12);
+ assert.equal(data.services.filter(s=>s.state==='online').length,9);
+ assert.equal(data.services.filter(s=>s.state==='not_monitored').length,3);
+ assert.equal(data.services.filter(s=>s.deployment==='UNKNOWN').length,12);
+ assert.equal(m.countHealth(),9);
+ assert.equal(m.calls.filter(c=>c.url.includes('backboard.railway.com')).length,0);
+});
+test('token-free private health mode safely distinguishes failed probes',async()=>{
+ const m=setup({health:true,noToken:true,failHealth:'nexo-browser'}),x=await m.login();
+ const r=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));
+ assert.equal(r.status,200);const data=await r.json();
+ assert.equal(data.services.find(s=>s.id==='nexo-browser').state,'unreachable');
+ assert.equal(data.services.find(s=>s.id==='nexo-eve-ipad-radar').state,'not_monitored');
+});
