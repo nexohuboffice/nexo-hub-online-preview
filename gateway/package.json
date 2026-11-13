@@ -5,7 +5,7 @@
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": {
-    "test": "node --test github-gateway.test.mjs",
+    "test": "node --test github-gateway.test.mjs http-smoke.test.mjs",
     "start": "node github-gateway.mjs"
   }
 }
