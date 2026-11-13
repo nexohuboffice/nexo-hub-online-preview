@@ -1,13 +1,22 @@
 # NEXO HUB — AI Command Center
 
-Public preview of NEXO HUB v0.7.3, **demonstration only**.
+**App pública:** https://nexohuboffice.github.io/nexo-hub-online-preview/
 
-- Dashboard, Chat, Agents, Missions, COMMS, Memory, Automations, Settings and Voice Demo
-- Chat, agents and messages are simulated; no connection to private Railway, Discord, Gmail or OpenAI services
-- Browser speech recognition may use browser vendor cloud services. Voice Demo is not the GPT-Live API
-- No API keys, secrets or real user data should be committed here
-- Preview GitHub Pages: https://nexohuboffice.github.io/nexo-hub-online-preview/ (requires enabling Pages from main/root)
+## v0.8 — Operations Preview (13 November 2026)
 
-To enable GitHub Pages, open repository **Settings → Pages**, select **Deploy from a branch**, `main`, `/(root)`, then save.
+A app mantém as oito secções e o Voice Demo. O Dashboard agora inclui **NEXO Status**: um snapshot sanitizado de uma auditoria real ao Railway, guardado em `status-snapshot.json` com data/hora. **Não é monitorização em direto.**
 
-Always publish only audited static assets here. Keep the private voice server, authentication, source backups and `.env` files outside this public repository.
+- 9 serviços contínuos online na última verificação
+- 3 tarefas cron com última execução concluída na última verificação
+- O Chat, Mission Control, COMMS, Memory, Automations e Voice são demonstrações sem integrações privadas
+- Sem segredos, OAuth cookies ou dados privados nesta app pública
+
+**Segurança:** o backend autenticado não está publicado. Desenvolvimento e critérios no [issue #2](https://github.com/nexohuboffice/nexo-hub-online-preview/issues/2). Antes de existir um gateway privado aprovado, usar o [Control Center oficial](https://nexo-discord-production.up.railway.app/login) para operações reais.
+
+Este repositório é público; não publicar `.env`, API keys, tokens Discord, segredos Railway, bases de dados ou dados pessoais.
+
+## GitHub Pages
+
+Servido de `main`, pasta `/(root)`. As atualizações desta branch são publicadas no mesmo link, sem novos ZIPs.
+
+O trabalho do gateway deve ficar isolado e sujeito a revisão de segurança e aprovação explícita antes de deployment.
