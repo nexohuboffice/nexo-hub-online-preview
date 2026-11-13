@@ -7,11 +7,12 @@ import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 
 export const HTTP_SERVICES = Object.freeze([
   'nexo-discord', 'nexo-browser', 'nexo-ui-assets', 'nexo-comms',
-  'nexo-autopilot', 'nexo-lyra-studio', 'nexo-transport', 'nexo-sandbox-lab',
-  'immo-discord-bootstrap'
+  'nexo-autopilot', 'nexo-lyra-studio', 'nexo-transport', 'nexo-sandbox-lab'
 ]);
+// One-off bootstrap has no HTTP server and must never be marked unhealthy by /health.
+export const NON_HTTP_SERVICES = Object.freeze(['immo-discord-bootstrap']);
 export const CRON_SERVICES = Object.freeze(['nexo-eve-ipad-radar', 'nexo-watchdog', 'immo-radar-hourly']);
-export const EXPECTED_SERVICES = Object.freeze([...HTTP_SERVICES, ...CRON_SERVICES]);
+export const EXPECTED_SERVICES = Object.freeze([...HTTP_SERVICES, ...NON_HTTP_SERVICES, ...CRON_SERVICES]);
 const API = 'https://backboard.railway.com/graphql/v2';
 const STATE_TTL = 10 * 60_000;
 const SESSION_TTL = 2 * 60 * 60_000;
@@ -87,7 +88,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   async function status(){
     if(cache.value&&cache.until>now())return cache.value;
     // Token-free mode is preferable for the initial live dashboard: it only probes
-    // nine fixed private /health endpoints and never receives a Railway API token.
+    // eight fixed private /health endpoints and never receives a Railway API token.
     // Cron jobs cannot be inferred from HTTP health and remain explicitly unknown.
     if(!railwayToken&&!privateHealth)return null;
     const entries=new Map();
@@ -110,7 +111,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     const services=await Promise.all(EXPECTED_SERVICES.map(async id=>{
       if(!entries.has(id))return {id,state:'not_monitored',deployment:'MISSING'};
       const deployment=entries.get(id).deployment;
-      if(CRON_SERVICES.includes(id))return {id,state:'not_monitored',deployment};
+      if(CRON_SERVICES.includes(id)||NON_HTTP_SERVICES.includes(id))return {id,state:'not_monitored',deployment};
       if(!privateHealth)return {id,state:'not_monitored',deployment};
       try{
         const r=await http(`http://${id}.railway.internal:8080/health`,{method:'GET',headers:{Accept:'application/json'},signal:AbortSignal.timeout(1600)});
