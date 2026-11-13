@@ -1,0 +1,29 @@
+/* NEXO HUB v0.8 — status read-only: public snapshot vs authenticated gateway. */
+.nexo-ops-shortcut{color:#cef5ff;background:linear-gradient(120deg,#183953,#11283a);border:1px solid rgba(101,226,249,.4);padding:7px 12px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.nexo-ops-shortcut:hover,.nexo-ops-shortcut:focus-visible{border-color:#65e2f9;box-shadow:0 0 0 2px #65e2f929}
+.nexo-ops-shortcut .nexo-ops-indicator{height:7px;width:7px;display:block;background:#f9c877;border-radius:50%;box-shadow:0 0 8px #f9c87755}
+.nexo-ops-panel{margin:26px 0 22px;padding:22px;overflow:hidden;border-radius:18px;background:linear-gradient(145deg,#0d2439,#10182b 60%);border:1px solid #365575;box-shadow:0 10px 26px #0002}
+.nexo-ops-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.nexo-ops-kicker{font-size:11px;letter-spacing:1.7px;color:#71ddec;font-weight:700}
+.nexo-ops-panel h2{margin:8px 0 5px;font-size:23px;color:#f3faff}
+.nexo-ops-panel p{color:#b8c8dc;margin:0 0 8px;font-size:12px;line-height:1.65}
+.nexo-ops-chip{border:1px solid #6c879e;background:#142d43;padding:6px 11px;color:#d0e7ff;border-radius:20px;font-size:10px;letter-spacing:.4px;white-space:nowrap}
+.nexo-ops-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.nexo-ops-actions a,.nexo-ops-actions button{font-size:12px!important;line-height:1.4!important;padding:10px 14px!important;border-radius:10px!important;background:#1b3a55;border:1px solid #476581;color:#e9f7ff;cursor:pointer;min-height:40px}
+.nexo-ops-actions a:hover,.nexo-ops-actions button:hover{background:#224963}
+.nexo-ops-actions button:disabled{cursor:not-allowed;opacity:.48}
+.nexo-ops-caption{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 9px;font-size:11px;color:#aebfd5}
+.nexo-ops-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.nexo-ops-service{border:1px solid #2b4863;padding:11px 12px;border-radius:12px;background:#0b1728;min-width:0}
+.nexo-ops-service strong{font-size:12px;display:block;overflow-wrap:anywhere;color:#eff7ff}
+.nexo-ops-service small{font-size:10px;color:#99aeca;letter-spacing:0;display:flex;align-items:center;gap:6px;padding-top:5px}
+.nexo-ops-dot{height:7px;width:7px;display:inline-block;border-radius:50%;background:#65dab1;flex-shrink:0}
+.nexo-ops-dot.pending{background:#ffca7a}
+.nexo-ops-dot.problem{background:#ff9292}
+.nexo-ops-note{font-size:11px;color:#ffdeaf;margin-top:14px!important;border-top:1px solid #294258;padding-top:10px}
+.nexo-ops-foot{font-size:10px;color:#8fa4bf;line-height:1.6;padding-top:10px}
+.nexo-ops-more{display:block;margin:11px auto 0;background:transparent;border:1px solid #34506b;border-radius:9px;padding:9px 12px;font-size:11px;color:#a9e9ff;cursor:pointer}
+.nexo-ops-more[hidden]{display:none}
+.nexo-ops-more:hover{background:#1d4059}
+@media(max-width:820px){.nexo-ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nexo-ops-panel{padding:17px}}
+@media(max-width:580px){.nexo-ops-grid{grid-template-columns:1fr}.nexo-ops-shortcut{padding:8px}.nexo-ops-shortcut span:not(.nexo-ops-indicator){display:none}.nexo-ops-panel h2{font-size:20px}.nexo-ops-panel{margin:18px 0}}
