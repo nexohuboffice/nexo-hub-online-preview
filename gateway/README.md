@@ -1,30 +1,49 @@
-# NEXO HUB v0.8 — gateway privado em preparação
+# NEXO HUB v0.8 — Gateway de login GitHub (candidato, não publicado)
 
-**Decisão de 13/11/2026:** testar **localmente** primeiro. Manter tudo fora da produção até login e segurança validados. A app pública GitHub Pages não é alterada nesta fase.
+## Objetivo
 
-## Duas possibilidades de identidade
-- Candidato anterior: **Discord OAuth owner-only** (arquitetura histórica NEXO)
-- Novo candidato local: **GitHub OAuth owner-only**, conta `nexohuboffice`, identidade numérica `353932686`, sem scopes `repo` nem `user:email`
+Login exclusivo de `nexohuboffice` **pelo ID numérico imutável**, sem permissões de acesso aos repositórios nem ao email. Autenticação e consulta de estado dos 12 serviços NEXO; nenhuma rota para criar missões, enviar emails, editar dados ou implementar deployments.
 
-A mudança para GitHub **não implica alterar** o login do CORE no Discord. Estas abordagens são independentes; não misturar tokens ou sessões.
+**Estado de 13/11/2026:** código local + testes simulados; não publicado; nenhuma conta GitHub OAuth App criada automaticamente; nenhum Railway token criado/recebido. A app pública [NEXO HUB](https://nexohuboffice.github.io/nexo-hub-online-preview/) mantém-se intacta e sem login privado. O candidato Discord anterior é outra abordagem e não é substituído por este trabalho.
 
-## Testes locais — GitHub OAuth
+## Testes sem segredos
 
-O candidato GitHub foi desenvolvido e testado localmente num pacote anexo à conversa ChatGPT em 13/11/2026. **O código ainda não está commitado nesta branch.** Não atribuir os testes ao pequeno esqueleto do repositório.
+```sh
+cd gateway
+node --test github-gateway.test.mjs
+```
 
-- **17/17 testes simulados** passaram em Node 22, incluindo login permitido/recusado, escopos OAuth, anti-CSRF, expiração, logout, consulta GraphQL sem mutações e isolamento de segredos.
-- Smoke test HTTP real no loopback: `GET /health` 200, `GET /api/status` 401 anónimo, `GET /api/session` 200/anónimo.
-- **OAuth externo, token Railway real e navegador do utilizador não testados.**
+É necessário Node.js 22 ou superior. **17 testes automatizados com HTTP GitHub e Railway simulado**, cobrindo autenticação, expiração, escopos OAuth vazios, CSRF, revogação de sessão, consulta read-only e confidencialidade. Os resultados locais não validam ainda OAuth com a conta real, Railway real nem navegação visual no teu Windows.
 
-Callback de desenvolvimento: `http://127.0.0.1:8788/auth/callback`, permitido para loopback GitHub. Domínio futuro de produção deverá ser HTTPS e usar callback exato `https://HOST/auth/callback`.
+## OAuth real em loopback local (apenas depois dos testes)
 
-A autenticação pública `GitHub Pages` **não** deve receber o token Railway, OAuth Client Secret ou cookies privados. O Railway Project Token é uma credencial com potencial de escrita, mesmo que a aplicação só faça queries.
+No GitHub, com sessão iniciada como `nexohuboffice`, abrir `https://github.com/settings/developers` → **OAuth Apps** → **New OAuth App**:
 
-## Bloqueios antes de um deployment
-1. Colocar e rever o código na branch dedicada.
-2. Escolher login GitHub ou Discord para este gateway (sem mudar o CORE).
-3. Auditar XSS/CSP, sessões persistentes, rate limiting e gestão de segredos.
-4. Testar OAuth real e Railway read-only em staging.
-5. Pedir autorização explícita antes de qualquer serviço/alteração de produção.
+- Application name: `NEXO HUB Login`
+- Homepage URL: `http://127.0.0.1:8788/`
+- Authorization callback URL: `http://127.0.0.1:8788/auth/callback`
+- Não selecionar permissões de `repo` ou `user:email`; a app pede **scope vazio** para consultar apenas o ID público de utilizador.
+- Desativar correspondência por wildcard para callbacks (se surgir a opção).
 
-Referência de trabalho: [Issue #2](https://github.com/nexohuboffice/nexo-hub-online-preview/issues/2).
+Guarda `Client ID` e `Client Secret` **fora do chat e do repositório**. No Windows executa `gateway/run-local.ps1` no PowerShell e introduz o segredo no prompt privado. Nunca coles o segredo num site público. O script não guarda segredos em ficheiros. A chave permanece na memória/processo local até o servidor terminar.
+
+**Importante:** `http://127.0.0.1` é uma exceção de desenvolvimento loopback suportada pelo GitHub, não é HTTPS público. O servidor só escuta em `127.0.0.1`. Para deployment remoto o gateway **rejeita HTTP não local** e requer HTTPS.
+
+## Railway — passo separado, opcional
+
+Sem token, o login pode ser testado, mas `/api/status` devolve HTTP 503 (não configurado). Depois de validar OAuth e rever segurança:
+
+1. Criar manualmente **Project Token** dedicado a `NEXO HUB / production` nas definições do projeto Railway.
+2. Definir `RAILWAY_PROJECT_TOKEN` apenas no backend, **nunca no GitHub Pages** ou no GitHub público.
+3. O código usa apenas GraphQL `query NexoReadOnlyStatus` com `Project-Access-Token` e verifica os IDs de projeto/ambiente na resposta. Não contém mutations nem expõe o token.
+4. No PC local, sem acesso ao DNS interno do Railway, as 9 sondagens internas ficam **não monitorizadas**, e os três cron também (não são marcados como online). O campo `deployment` reflete apenas o último deployment.
+5. Em Railway, opcionalmente ativar `NEXO_PRIVATE_RAILWAY_HEALTH=1` para sondar os nove serviços contínuos via hostnames internos fixos. Isso não verifica as execuções cron.
+
+**Atenção:** um Project Token do Railway pode ter privilégios de escrita independentemente de o código executar apenas leituras. Uma fuga do token não seria read-only. Configurar limites, rotação e segurança em staging antes do uso real.
+
+## Limitações antes de produção
+
+- Sessões e states apenas **em memória**: adequados para teste local com uma instância, não para múltiplas réplicas ou continuidade após reinício. Introduzir Redis/DB de sessão e proteção distribuída contra replay e rate limiting antes do deployment.
+- Falta auditoria de segurança independente, logs de acesso minimizados, alertas, testes OAuth reais e recuperação de falhas no navegador.
+- Não servir nem injetar HTML mutável do GitHub Pages na origem com cookies autenticados sem uma auditoria de XSS, CSP e bundle versionado.
+- Não foi publicado serviço no Railway, nem autorizados novos custos. CORE, COMMS, Discord, Voice e missões existentes não sofreram alterações.
