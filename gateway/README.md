@@ -1,23 +1,30 @@
-# NEXO HUB v0.8 — Gateway privado (candidato; NÃO publicado)
+# NEXO HUB v0.8 — gateway privado em preparação
 
-Esta pasta prepara um serviço **separado** para a ligação real do NEXO, mas **não está implementada no Railway**.
+**Decisão de 13/11/2026:** testar **localmente** primeiro. Manter tudo fora da produção até login e segurança validados. A app pública GitHub Pages não é alterada nesta fase.
 
-- Login Discord OAuth2 restrito ao ID imutável do proprietário.
-- Cookie HttpOnly + Secure + SameSite e state de autenticação assinado.
-- API **somente GET /api/status**, com verificação de saúde de 9 serviços HTTP, sempre via rede privada do Railway.
-- Os 3 serviços cron são apresentados como *não monitorizados* (não como offline).
-- Sem ações de missões, Gmail, APIs de IA, voz Live, escrita ou token no browser.
-- O domínio GitHub Pages mantém apenas a demo e o snapshot público datado.
-- **BLOQUEIO DE SEGURANÇA:** não ativar o proxy experimental de HTML público sob a origem autenticada antes da auditoria de XSS/CSP e de fixar um bundle versionado. Não dar permissões à aplicação pública.
+## Duas possibilidades de identidade
+- Candidato anterior: **Discord OAuth owner-only** (arquitetura histórica NEXO)
+- Novo candidato local: **GitHub OAuth owner-only**, conta `nexohuboffice`, identidade numérica `353932686`, sem scopes `repo` nem `user:email`
 
-## Antes de qualquer deployment
+A mudança para GitHub **não implica alterar** o login do CORE no Discord. Estas abordagens são independentes; não misturar tokens ou sessões.
 
-1. Rever código e autenticação OAuth2, sessões, origin, CSP, rate limiting e CSRF.
-2. Escolher domínio HTTPS dedicado e definir variáveis **no Railway**: GATEWAY_PUBLIC_ORIGIN, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OWNER_ID, SESSION_SECRET (forte).
-3. Registar redirect URI exato em Discord Developer Portal `https://GATEWAY/auth/callback`.
-4. Testar login owner e non-owner e serviços com dados simulados e em staging.
-5. Exigir aprovação explícita do proprietário antes de criar serviço pago ou publicar.
+## Testes locais — GitHub OAuth
 
-## Verificação local
+O candidato GitHub foi desenvolvido e testado localmente num pacote anexo à conversa ChatGPT em 13/11/2026. **O código ainda não está commitado nesta branch.** Não atribuir os testes ao pequeno esqueleto do repositório.
 
-Node.js 22+; `npm test` — 11 testes com rede/Discord simulados, 0 falhas. Não prova login real.
+- **17/17 testes simulados** passaram em Node 22, incluindo login permitido/recusado, escopos OAuth, anti-CSRF, expiração, logout, consulta GraphQL sem mutações e isolamento de segredos.
+- Smoke test HTTP real no loopback: `GET /health` 200, `GET /api/status` 401 anónimo, `GET /api/session` 200/anónimo.
+- **OAuth externo, token Railway real e navegador do utilizador não testados.**
+
+Callback de desenvolvimento: `http://127.0.0.1:8788/auth/callback`, permitido para loopback GitHub. Domínio futuro de produção deverá ser HTTPS e usar callback exato `https://HOST/auth/callback`.
+
+A autenticação pública `GitHub Pages` **não** deve receber o token Railway, OAuth Client Secret ou cookies privados. O Railway Project Token é uma credencial com potencial de escrita, mesmo que a aplicação só faça queries.
+
+## Bloqueios antes de um deployment
+1. Colocar e rever o código na branch dedicada.
+2. Escolher login GitHub ou Discord para este gateway (sem mudar o CORE).
+3. Auditar XSS/CSP, sessões persistentes, rate limiting e gestão de segredos.
+4. Testar OAuth real e Railway read-only em staging.
+5. Pedir autorização explícita antes de qualquer serviço/alteração de produção.
+
+Referência de trabalho: [Issue #2](https://github.com/nexohuboffice/nexo-hub-online-preview/issues/2).
