@@ -1,0 +1,78 @@
+{
+  "schema": "nexo.status.snapshot.v1",
+  "source": "Railway environment_status (read-only)",
+  "environment": "production",
+  "checkedAt": "2026-11-13T06:04:54.327Z",
+  "realTime": false,
+  "serviceCount": 12,
+  "services": [
+    {
+      "id": "immo-discord-bootstrap",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "immo-radar-hourly",
+      "type": "cron",
+      "state": "last_succeeded",
+      "lastRun": "2026-11-13T05:11:37.490Z"
+    },
+    {
+      "id": "nexo-autopilot",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-browser",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-comms",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-discord",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-eve-ipad-radar",
+      "type": "cron",
+      "state": "last_succeeded",
+      "lastRun": "2026-11-13T06:01:06.842Z"
+    },
+    {
+      "id": "nexo-lyra-studio",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-sandbox-lab",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-transport",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-ui-assets",
+      "type": "service",
+      "state": "online"
+    },
+    {
+      "id": "nexo-watchdog",
+      "type": "cron",
+      "state": "last_succeeded",
+      "lastRun": "2026-11-13T06:00:58.513Z"
+    }
+  ],
+  "warnings": [
+    "Registo pontual de auditoria; não representa estado em direto.",
+    "Cron succeeded refere-se apenas à última execução observada; não confirma a qualidade dos resultados.",
+    "Nenhuma informação pessoal ou credencial incluída."
+  ]
+}
