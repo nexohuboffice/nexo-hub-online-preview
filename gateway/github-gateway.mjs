@@ -86,19 +86,26 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   }
   async function status(){
     if(cache.value&&cache.until>now())return cache.value;
-    if(!railwayToken)return null;
-    const response=await http(API,{
-      method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Project-Access-Token':railwayToken},
-      body:JSON.stringify({query:QUERY,variables:{id:environmentId}}),signal:AbortSignal.timeout(8000)
-    });
-    if(!response.ok)throw Error('Railway returned error');
-    const payload=await response.json();
-    if(payload.errors?.length||payload.data?.projectToken?.projectId!==projectId||payload.data?.projectToken?.environmentId!==environmentId||payload.data?.environment?.id!==environmentId)throw Error('Railway token scope or response rejected');
-    const items=payload.data.environment?.serviceInstances?.edges;
-    if(!Array.isArray(items)||items.length>80)throw Error('Railway inventory malformed');
+    // Token-free mode is preferable for the initial live dashboard: it only probes
+    // nine fixed private /health endpoints and never receives a Railway API token.
+    // Cron jobs cannot be inferred from HTTP health and remain explicitly unknown.
+    if(!railwayToken&&!privateHealth)return null;
     const entries=new Map();
-    for(const item of items){const instance=item?.node;const id=instance?.serviceName;if(!EXPECTED_SERVICES.includes(id)||entries.has(id))continue;
-      entries.set(id,{deployment:instance?.latestDeployment?.status||'UNKNOWN'});
+    if(railwayToken){
+      const response=await http(API,{
+        method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Project-Access-Token':railwayToken},
+        body:JSON.stringify({query:QUERY,variables:{id:environmentId}}),signal:AbortSignal.timeout(8000)
+      });
+      if(!response.ok)throw Error('Railway returned error');
+      const payload=await response.json();
+      if(payload.errors?.length||payload.data?.projectToken?.projectId!==projectId||payload.data?.projectToken?.environmentId!==environmentId||payload.data?.environment?.id!==environmentId)throw Error('Railway token scope or response rejected');
+      const items=payload.data.environment?.serviceInstances?.edges;
+      if(!Array.isArray(items)||items.length>80)throw Error('Railway inventory malformed');
+      for(const item of items){const instance=item?.node;const id=instance?.serviceName;if(!EXPECTED_SERVICES.includes(id)||entries.has(id))continue;
+        entries.set(id,{deployment:instance?.latestDeployment?.status||'UNKNOWN'});
+      }
+    }else{
+      for(const id of EXPECTED_SERVICES)entries.set(id,{deployment:'UNKNOWN'});
     }
     const services=await Promise.all(EXPECTED_SERVICES.map(async id=>{
       if(!entries.has(id))return {id,state:'not_monitored',deployment:'MISSING'};
