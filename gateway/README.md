@@ -36,8 +36,8 @@ Sem token, o login pode ser testado, mas `/api/status` devolve HTTP 503 (não co
 1. Criar manualmente **Project Token** dedicado a `NEXO HUB / production` nas definições do projeto Railway.
 2. Definir `RAILWAY_PROJECT_TOKEN` apenas no backend, **nunca no GitHub Pages** ou no GitHub público.
 3. O código usa apenas GraphQL `query NexoReadOnlyStatus` com `Project-Access-Token` e verifica os IDs de projeto/ambiente na resposta. Não contém mutations nem expõe o token.
-4. No PC local, sem acesso ao DNS interno do Railway, as 9 sondagens internas ficam **não monitorizadas**, e os três cron também (não são marcados como online). O campo `deployment` reflete apenas o último deployment.
-5. Em Railway, opcionalmente ativar `NEXO_PRIVATE_RAILWAY_HEALTH=1` para sondar os nove serviços contínuos via hostnames internos fixos. Isso não verifica as execuções cron.
+4. No PC local, sem acesso ao DNS interno do Railway, as 8 sondagens internas ficam **não monitorizadas**, e os três cron também (não são marcados como online). O campo `deployment` reflete apenas o último deployment.
+5. Em Railway, opcionalmente ativar `NEXO_PRIVATE_RAILWAY_HEALTH=1` para sondar os oito serviços HTTP via hostnames internos fixos. Isso não verifica as execuções cron.
 
 **Atenção:** um Project Token do Railway pode ter privilégios de escrita independentemente de o código executar apenas leituras. Uma fuga do token não seria read-only. Configurar limites, rotação e segurança em staging antes do uso real.
 
@@ -55,10 +55,14 @@ O candidato valida agora o **Host** recebido no pedido contra o domínio configu
 
 ### Preferência atual: primeira leitura Live **sem Project Token**
 
-Se for aprovado um gateway privado dentro do mesmo ambiente Railway, a opção `NEXO_PRIVATE_RAILWAY_HEALTH=1` sem `RAILWAY_PROJECT_TOKEN` permite sondar apenas os nove endpoints `/health` privados de endereços fixos `<nome>.railway.internal:8080`, sem configurar nenhum token de projeto. Os três serviços cron permanecem `not_monitored` e o campo `deployment` aparece `UNKNOWN` porque o gateway **não consulta** a API Railway.
+Se for aprovado um gateway privado dentro do mesmo ambiente Railway, a opção `NEXO_PRIVATE_RAILWAY_HEALTH=1` sem `RAILWAY_PROJECT_TOKEN` permite sondar apenas os oito endpoints `/health` privados de endereços fixos `<nome>.railway.internal:8080`, sem configurar nenhum token de projeto. Os três serviços cron e o bootstrap IMMO permanecem `not_monitored` e o campo `deployment` aparece `UNKNOWN` porque o gateway **não consulta** a API Railway.
 
 **Limites:** este modo não funciona como verificação da produção a partir do PC local (o domínio interno só é resolvido dentro da rede privada Railway). É necessário validar as portas e respostas dos serviços, verificar autenticação e endurecimento do domínio HTTPS, e obter aprovação para qualquer novo serviço/custo antes de publicar. Não fazer merge para main nem criar serviço Railway nesta fase.
 
 ### Provas executadas
 
-`npm test` — **23 testes aprovados**, incluindo HTTP real em `127.0.0.1` sem quaisquer segredos reais. Os fornecedores GitHub/Railway foram simulados; o login OAuth real e os serviços privados de Railway **não foram ensaiados**.
+`npm test` — **24 testes aprovados**, incluindo HTTP real em `127.0.0.1` sem quaisquer segredos reais. Os fornecedores GitHub/Railway foram simulados; o login OAuth real e os serviços privados de Railway **não foram ensaiados**.
+
+### Confirmação da topologia Railway (somente leitura)
+
+A fonte implantada de `immo-discord-bootstrap` confirma que é um provisionador **one-off**, sem servidor HTTP ou `/health`; portanto está em `NON_HTTP_SERVICES` e **não é sondado**. O serviço Docker `nexo-browser` declara `healthcheckPath=/health`. São **oito** serviços HTTP a sondar e **quatro** estados `not_monitored` (3 cron + 1 bootstrap). Esta auditoria não constitui uma sondagem real da rede privada.
