@@ -1,0 +1,974 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><meta name="theme-color" content="#080d1d"><meta name="description" content="NEXO HUB — preview online da app; apenas dados fictícios."><title>NEXO HUB · AI Command Center — Preview</title><style>
+/* NEXO HUB v0.5 — consolidated stylesheet. */
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.6 'Segoe UI',sans-serif}
+aside{position:fixed;inset:0 auto 0 0}
+a{color:inherit;text-decoration:none}
+.brand{font-weight:750;letter-spacing:2px;display:block}
+.brand b{color:var(--cyan);font-size:36px}
+.brand span{display:block;color:var(--muted);padding-left:42px}
+small{font-size:10px;letter-spacing:2px;color:var(--muted)}
+nav a{display:block;margin:6px 0;border-radius:9px;color:var(--muted)}
+nav a:hover{background:#19233a}
+footer{font-size:12px;color:var(--muted)}
+footer p{font-size:11px}
+i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-right:8px;box-shadow:0 0 15px var(--cyan)}
+header{border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-size:11px;letter-spacing:1px;color:var(--muted)}
+.badge{border:1px solid #385066;border-radius:20px;padding:5px 12px;font-size:10px}
+h1{line-height:1.2;margin:8px 0 12px}
+h2{margin:0 0 20px}
+h3{margin:8px 0;font-size:16px}
+p{color:var(--muted);margin:8px 0 22px}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.panel{padding:24px;min-width:0}
+.stat strong{display:block;margin:10px 0}
+.stat span{color:var(--muted);font-size:12px}
+.hero{border-radius:18px}
+.hero:after{content:'✦';position:absolute;right:7%;top:-35px;font-size:220px;color:#83bdff29;pointer-events:none}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.two{display:grid}
+.avatar{display:grid;place-items:center}
+.muted{color:var(--muted);font-size:12px}
+button,.button{border:1px solid #35415e;background:#1b2941;color:#eaf3ff;padding:10px 17px;font:inherit;font-size:13px;cursor:pointer;display:inline-block}
+button:hover,.button:hover{border-color:var(--cyan);transform:translateY(-1px)}
+.primary{border-color:var(--cyan)}
+.item{border-bottom:1px solid var(--line)}
+progress{width:100%;accent-color:var(--cyan)}
+input,textarea,select{width:100%;border:1px solid #37415b;border-radius:9px;color:#eef3ff;padding:13px;font:inherit;margin:8px 0 16px}
+textarea{min-height:120px;resize:vertical}
+label{color:var(--muted)}
+.chat{overflow:auto}
+.switch{color:var(--cyan)}
+#toast{position:fixed;bottom:24px;right:24px;padding:15px 24px;background:#233d50;border-radius:12px;display:none}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+@media(max-width:1000px){
+aside{width:190px;padding:24px 14px}
+main{margin-left:190px;padding:0 22px 30px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.two{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+aside{border-right:0}
+.brand span,aside small,footer{display:none}
+nav{display:flex;overflow:auto}
+nav a{white-space:nowrap}
+header{font-size:9px}
+.heading{align-items:flex-start}
+h1{font-size:27px}
+.stats,.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.hero:after{right:-35px}
+.heading .button{font-size:11px}
+.two{gap:16px}
+}
+@media(prefers-reduced-motion:reduce){
+*{animation:none!important;transition:none!important}
+}
+:root{--panel:#101728}
+body{font-family:Inter,'Segoe UI',sans-serif;font-size:14px}
+aside{width:226px;padding:30px 20px;backdrop-filter:blur(16px)}
+main{margin-left:226px;max-width:1920px}
+h1{font-size:32px;font-weight:650;letter-spacing:-1.2px}
+h2{font-size:17px;font-weight:600}
+h3{font-weight:600}
+nav a{font-size:13px;padding:11px 15px}
+nav a.active{border:1px solid #5ce1ed25}
+.brand{font-size:25px;margin-bottom:44px}
+.brand span{font-size:8px;letter-spacing:2px}
+.slash{margin:0 12px;color:#465472}
+.user-avatar{height:32px;width:32px;display:grid;place-items:center;border:1px solid #7b6ac055;border-radius:50%;background:#292441;font-size:10px;color:#d6c4ff}
+.heading p{font-size:13px;margin:10px 0 0}
+.eyebrow{font-size:9px;letter-spacing:2.5px}
+.button,button{min-height:42px;transition:background .18s,border-color .18s,transform .18s;font-size:12px;border-color:#ffffff16;background:#ffffff05;white-space:normal}
+button:disabled{opacity:.42;cursor:not-allowed;transform:none}
+.primary{border:0}
+.panel{border-color:#ffffff10;border-radius:15px}
+.hero{border-color:#5ce1ed25;align-items:center;justify-content:space-between}
+.hero:after{display:none}
+.hero h1{font-size:34px;margin:12px 0}
+.hero .eyebrow{display:flex;align-items:center;gap:8px}
+.core-visual{width:175px;height:175px;position:relative;display:grid;place-items:center;flex-shrink:0;margin-right:45px}
+.core-visual:before,.core-visual:after{content:'';position:absolute;inset:0;border:1px solid #79e1ff35;border-radius:50%;transform:rotateX(20deg) rotate(-25deg);box-shadow:0 0 35px #7b5cdd18}
+.core-visual:after{inset:20px;border-style:dashed;border-color:#b895ff60;animation:orbit 50s linear infinite}
+.core-visual b{font-size:78px;color:#9ceeff;text-shadow:0 0 35px #50cbff88;z-index:1}
+.core-visual span{position:absolute;bottom:-12px;font-size:8px;letter-spacing:3px;color:#b9b4da}
+.stat strong{line-height:1.3;letter-spacing:-1px}
+.stat .metric-top{display:flex;align-items:center;justify-content:space-between;color:#b4bfd2}
+.metric-top em{font-style:normal;color:var(--cyan);font-size:19px}
+.stat .spark{display:flex;align-items:flex-end;gap:4px;height:22px}
+.spark b{width:5px;border-radius:2px}
+.section-title{margin:25px 0 14px;display:flex;justify-content:space-between;align-items:center}
+.section-title h2{margin:0}
+.section-title a{font-size:11px;color:var(--muted)}
+.agent-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.agent-tile{text-align:center;min-width:0;border:1px solid #ffffff10;cursor:pointer}
+.agent-tile:hover{border-color:var(--agent);background:#172238}
+.agent-tile .avatar{margin:0 auto 12px}
+.avatar{color:var(--agent,var(--cyan));border:1px solid color-mix(in srgb,var(--agent,var(--cyan)) 35%,transparent);width:44px;height:44px;font-size:23px}
+.agent-tile small{display:block;letter-spacing:0}
+.two{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;margin:20px 0}
+.section-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.section-head h2{margin:0}
+.item{border-color:#ffffff0b;padding:17px 0}
+.mission-link{display:block;text-align:left;width:100%;border:0;padding:0;background:transparent}
+.mission-meta{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.tag{display:inline-block;letter-spacing:.5px;padding:3px 8px;border-radius:5px;border:1px solid #ffffff10;color:#b8c4d8}
+.status-running{color:#76d9ff;background:#40bbff10}
+.status-done{color:#7fe5bd;background:#55dcad10}
+.status-blocked{color:#f3c97b;background:#ffba4410}
+.status-failed{color:#ff9eaa;background:#ff587910}
+.priority{color:#d3b1ff}
+.progress-row{display:flex;align-items:center;gap:12px;font-size:10px;color:var(--muted)}
+progress{border:0;border-radius:6px;overflow:hidden;height:4px;background:#222b40}
+progress::-webkit-progress-bar{background:#222b40}
+progress::-webkit-progress-value{background:linear-gradient(90deg,#627dff,#55ddec)}
+.event{display:flex;gap:13px;position:relative}
+.event:before{content:'';position:absolute;left:5px;top:30px;bottom:-6px;border-left:1px solid #31405b}
+.event:last-child:before{display:none}
+.event-dot{width:11px;height:11px;margin-top:5px;border-radius:50%;background:#1c3342;border:2px solid #69c5de;flex-shrink:0}
+.event p{font-size:12px;color:#c3cee1;margin:0 0 5px}
+.core-mini{display:flex;align-items:center;gap:12px;padding:14px 10px;border:1px solid var(--line);border-radius:10px;color:var(--cyan);font-size:23px}
+.core-mini span{font-size:10px;color:#d2dcf0}
+.core-mini small{display:block;font-size:7px;letter-spacing:1px;color:var(--muted)}
+.disclaimer{text-align:center;margin-top:35px}
+.grid{gap:16px}
+.agent-card{position:relative;overflow:hidden}
+.agent-card:before{content:'';position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--agent),transparent)}
+.agent-card h2{margin:18px 0 4px}
+.chips{display:flex;flex-wrap:wrap;margin:15px 0 20px}
+.history{border-radius:8px;background:#ffffff03;color:var(--muted);margin-bottom:20px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.mission-layout{display:grid;gap:18px}
+.mission-list .selected{border-color:#63d8ed66;background:#172b3d}
+.mission-list button{margin-bottom:10px;border:1px solid var(--line);border-radius:12px}
+.mission-list h3{font-size:13px}
+.task{border-bottom:1px solid var(--line)}
+.task .number{display:grid;place-items:center;border-radius:8px;font-size:12px;color:var(--cyan)}
+.task .actions{margin-top:12px}
+.task .row{justify-content:flex-start}
+.task .tag{margin-left:auto}
+.result{border:1px solid #65d8b325;border-radius:10px;margin-top:20px}
+.result h3{color:#8be8c5;font-size:13px}
+.result p{font-size:12px;margin-bottom:0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.tabs button[aria-pressed=true]{color:var(--cyan)}
+.chat-layout{display:grid}
+.chat-agents button{display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left}
+.chat-agents .avatar{font-size:18px;flex-shrink:0}
+.chat-panel{display:flex;flex-direction:column}
+.chat{flex:1;min-height:290px;max-height:500px;padding:12px 0}
+.chat-empty{text-align:center}
+.chat-empty .avatar{margin:auto;font-size:36px}
+.chat-empty p{max-width:410px;margin:12px auto}
+.message{border:1px solid #ffffff09}
+.message small{display:block;margin-bottom:8px}
+.composer{border:1px solid #4b607c}
+.composer textarea{margin:0;padding:5px;border:0;max-height:170px;background:transparent;resize:vertical}
+.composer .row{justify-content:space-between}
+.composer .muted{font-size:10px}
+.typing{font-size:12px;color:var(--cyan);animation:pulse 1s ease-in-out infinite}
+.error{border:1px solid #ff8d9c66;background:#ff71850c;padding:12px;border-radius:8px;color:#ffb2bb;margin:10px 0;font-size:12px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+label{display:block;font-size:12px}
+input,textarea,select{background:#0b1222;border-color:#29354c;font-size:13px}
+dialog{color:#eff4ff;border:1px solid #3c526c;border-radius:18px;width:min(580px,calc(100% - 30px));padding:26px}
+dialog h2{margin:0}
+.notification.unread{border-left:2px solid var(--cyan);padding-left:14px}
+.notification p{color:#d1dced;font-size:13px}
+.note-preview{white-space:pre-wrap;overflow-wrap:anywhere}
+.skip{position:fixed;top:-60px;left:20px;background:#5ce1ed;color:#071222;padding:12px;z-index:100}
+.skip:focus{top:10px}
+#storage-warning{padding:12px;background:#573c20;color:#ffe0b0;margin-top:15px;border-radius:8px;font-size:12px}
+#toast{z-index:20;max-width:calc(100% - 40px);box-shadow:0 10px 40px #0006}
+#view{outline:none}
+footer{margin-top:38px}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #81e9ff;outline-offset:3px}
+.form-hint{font-size:11px;margin-top:-7px}
+.notification-count{color:var(--cyan)}
+.subtle{font-size:11px;color:var(--muted)}
+.mission-detail h2{line-height:1.5}
+.note-count{text-align:right;font-size:11px;color:var(--muted)}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{opacity:.5}}
+@media(min-width:1550px){
+main{padding-left:50px;padding-right:50px}
+.hero{padding:35px 40px;min-height:260px}
+.hero h1{font-size:40px}
+.core-visual{margin-right:90px;width:190px;height:190px}
+}
+@media(max-width:1150px){
+aside{width:190px}
+main{margin-left:190px;padding:0 22px 30px}
+.agent-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+.core-visual{margin-right:0;width:135px;height:135px}
+.hero h1{font-size:29px}
+.mission-layout{grid-template-columns:1fr}
+.mission-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.chat-layout{grid-template-columns:160px minmax(0,1fr)}
+}
+@media(max-width:850px){
+.two{grid-template-columns:1fr}
+.chat-layout{grid-template-columns:1fr}
+.chat-agents{display:flex;overflow:auto;gap:6px;padding:8px}
+.chat-agents h2{display:none}
+.chat-agents button{width:auto;flex-shrink:0}
+.chat-agents button span:last-child{font-size:11px}
+.chat-panel{min-height:520px}
+.hero{padding:25px}
+.core-visual{width:105px;height:105px}
+.core-visual b{font-size:50px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:650px){
+aside{top:0;width:100%}
+main{margin:0}
+.brand{display:inline-block;margin:0;line-height:1}
+.brand span{display:none}
+nav{padding-bottom:6px;scrollbar-width:none}
+nav a{margin:0}
+.user-avatar{display:none}
+.badge{padding:4px 8px}
+.heading{flex-wrap:wrap}
+.hero h1{font-size:29px}
+.core-visual{display:none}
+.stat span{font-size:10px}
+.grid{grid-template-columns:1fr}
+.chat .message{max-width:95%}
+.composer .muted{max-width:160px}
+.task .row{flex-wrap:wrap}
+.two{margin:18px 0}
+.row{min-width:0}
+.mission-meta{flex-wrap:wrap}
+.heading .button{min-height:44px}
+.actions button,button{min-height:44px}
+.panel h2{overflow-wrap:anywhere}
+.notification p,h3,.message{overflow-wrap:anywhere}
+}
+@media(prefers-reduced-motion:reduce){
+
+}
+.mission-link{overflow-wrap:anywhere}
+.message{white-space:pre-wrap}
+.spark{opacity:.7}
+.hero-title{letter-spacing:-1.2px}
+.hero .eyebrow i{box-shadow:0 0 12px #5ce1ed77}
+.agent-card:hover{border-color:color-mix(in srgb,var(--agent) 35%,transparent)}
+#view{scroll-margin-top:120px}
+@media(min-width:1550px){
+.hero-title{font-size:40px}
+}
+@media(max-width:1150px){
+.hero-title{font-size:29px}
+}
+@media(max-width:650px){
+.grid.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stats .spark{display:none}
+.stats .metric-top{gap:6px}
+.stats .metric-top em{font-size:16px}
+.stats .stat strong{margin:12px 0}
+}
+:root{--bg:#060a15;--cyan:#65e6ff;--purple:#bb9bff;--muted:#a4b2cc;--line:#91b2ff18}
+body{background:radial-gradient(ellipse at 75% -5%,#49398628,transparent 42%),radial-gradient(ellipse at 20% 75%,#12537412,transparent 40%),#060a15;color:#edf3ff}
+body:before{content:'';position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#82b3ff03 1px,transparent 1px),linear-gradient(90deg,#82b3ff03 1px,transparent 1px);background-size:48px 48px;z-index:-1}
+aside{background:linear-gradient(165deg,#0c1429ed,#080d1bee);border-right:1px solid #91b2ff13;box-shadow:12px 0 60px #0002}
+main{padding:0 34px 34px}
+header{border-color:#ffffff0b;height:76px}
+.brand b{filter:drop-shadow(0 0 12px #65e6ff55)}
+nav a{position:relative;min-height:44px}
+nav a.active{background:linear-gradient(90deg,#1b435357,#1b284733);box-shadow:inset 2px 0 #6be8ff,0 0 24px #59d6ed08;color:#b0f5ff}
+.heading{margin:27px 0 24px}
+.heading h1{font-weight:650;letter-spacing:-1.1px;font-size:31px}
+.eyebrow{color:#80def2}
+.panel{background:linear-gradient(145deg,#17223a9c,#0b1425e6);border:1px solid #b3caff15;box-shadow:inset 0 1px #d0e1ff05,0 12px 32px #0002}
+.section-head{margin-bottom:18px}
+.hero{position:relative;isolation:isolate;min-height:340px;padding:35px 38px;display:grid;grid-template-columns:1.1fr 1fr;gap:10px;overflow:hidden;background:radial-gradient(ellipse at 85% 30%,#784cfb23,transparent 55%),radial-gradient(ellipse at 20% 110%,#11c6ee16,transparent 55%),linear-gradient(110deg,#101d32,#0a1228);border:1px solid #88bfff2b;box-shadow:inset 0 1px #d7f4ff10,0 20px 70px #0003}
+.hero:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 60%,#a4c9ff08 60.1%,transparent 60.3%),linear-gradient(155deg,transparent 50%,#a4c9ff07 50.1%,transparent 50.3%)}
+.hero-copy{z-index:1}
+.hero-title{font-size:clamp(28px,2.5vw,42px);font-weight:650;line-height:1.16;max-width:610px;margin:21px 0 14px;text-wrap:balance}
+.hero-label{font-size:8px;letter-spacing:2.7px;color:#a49ccb;margin:12px 0 20px}
+.hero p{font-size:13px;line-height:1.8;color:#b2c2dc;max-width:430px}
+.primary{background:linear-gradient(110deg,#8cf0ff,#57cbe9);box-shadow:0 4px 22px #52d6e71c;color:#06212e;font-weight:650}
+.primary:hover{box-shadow:0 4px 28px #52d6e736;background:linear-gradient(110deg,#aff6ff,#70daf5)}
+button,.button{border-radius:10px;min-height:44px}
+button:hover:not(:disabled),.button:hover{background-color:#99bcff0d;border-color:#84dcf66b}
+button.primary:hover{background:linear-gradient(110deg,#aff6ff,#70daf5)}
+.command-orbit{height:300px;width:100%;max-width:390px;justify-self:center;position:relative;display:grid;place-items:center;contain:layout paint}
+.orbit-grid{position:absolute;inset:0;background:radial-gradient(ellipse,#58dcff12,transparent 68%)}
+.orbit-ring{position:absolute;width:245px;height:245px;border:1px solid #91b7fc26;border-radius:50%;box-shadow:0 0 50px #7964ff08}
+.ring-one:after{content:'';position:absolute;inset:8px;border:1px dashed #64d8f72b;border-radius:50%;animation:orbit 90s linear infinite}
+.ring-two{width:190px;height:190px;border-color:#bd9aff23;transform:rotateX(55deg) rotate(-25deg)}
+.orbit-core{width:135px;height:135px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,#4a34692b,#0b152b);border:1px solid #70e2ff4a;box-shadow:0 0 40px #65dfff12,inset 0 0 25px #9a74ff10;z-index:2}
+.orbit-core .avatar{width:74px;height:74px;border:0;box-shadow:none;background:transparent;border-radius:18px}
+.orbit-core span{font-size:9px;color:#cff7ff;letter-spacing:2px;margin-top:8px}
+.orbit-core small{font-size:5px;letter-spacing:1.3px;margin-top:4px;color:#a4b4cf}
+.orbit-node{position:absolute;z-index:2;display:flex;align-items:center;flex-direction:column;gap:5px}
+.orbit-node .avatar{width:43px;height:43px;border-radius:13px;box-shadow:0 0 22px #0008}
+.orbit-node span{font-size:7px;color:#b8c8e6;letter-spacing:1px}
+.node-0{top:12px;left:calc(50% - 22px)}
+.node-1{top:65px;right:25px}
+.node-2{bottom:60px;right:25px}
+.node-3{bottom:8px;left:calc(50% - 22px)}
+.node-4{bottom:60px;left:25px}
+.node-5{top:65px;left:25px}
+.orbit-caption{position:absolute;bottom:0;left:0;font-size:6px;letter-spacing:1.3px;color:#96b7d2;transform:rotate(-90deg);transform-origin:0 0}
+.orbit-caption i{width:4px;height:4px;margin-right:5px}
+.avatar{border-radius:15px;background:#101b30;overflow:hidden;flex-shrink:0;box-shadow:0 4px 16px #0003}
+.avatar img{width:100%;height:100%;object-fit:contain;display:block}
+.stats{margin:18px 0 28px;gap:14px}
+.stat{background:linear-gradient(130deg,#142239b3,#0c1325);padding:20px 22px;position:relative;overflow:hidden}
+.stat:after{content:'';position:absolute;bottom:0;left:18%;right:18%;height:1px;background:linear-gradient(90deg,transparent,#62d9f94d,transparent)}
+.stat strong{font-size:31px;font-weight:600}
+.stat .metric-top span{font-size:12px;color:#b2c0d7}
+.stat>span{font-size:10px}
+.stat .spark{opacity:.8}
+.spark b{background:linear-gradient(#6ddcff,#5366d7)}
+.agent-strip{gap:12px}
+.agent-tile{position:relative;padding:20px 8px 17px;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--agent) 9%,transparent),transparent 70%),#101829;transition:border-color .2s,transform .2s,box-shadow .2s}
+.agent-tile:hover{transform:translateY(-3px);box-shadow:0 8px 30px color-mix(in srgb,var(--agent) 10%,transparent)}
+.agent-tile .avatar{width:61px;height:61px;margin-bottom:14px;border-color:color-mix(in srgb,var(--agent) 30%,transparent)}
+.agent-tile strong{font-size:11px;letter-spacing:1.4px}
+.agent-tile small{font-size:9px;color:#a7b7d0;margin-top:6px}
+.agent-line{position:absolute;bottom:0;left:20%;width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--agent),transparent);opacity:.5}
+.section-title h2{font-size:18px}
+.section-title .subtle{font-size:11px}
+.mission-link h3{font-size:14px;line-height:1.5}
+.mission-meta{font-size:11px;margin:12px 0}
+.tag{font-size:10px;border-color:#a8c2f021;background:#97b3ff08;line-height:1.5}
+.event{padding:15px 0}
+.event p{line-height:1.7}
+.event-dot{box-shadow:0 0 10px #7ce4ff20}
+.event time{font-size:11px;color:#9baecb}
+.agent-card{padding:24px;background:radial-gradient(ellipse at 80% 0%,color-mix(in srgb,var(--agent) 9%,transparent),transparent 65%),linear-gradient(145deg,#131e34,#0c1424);transition:transform .2s,border-color .2s}
+.agent-card:hover{transform:translateY(-2px)}
+.agent-card>.row{align-items:flex-start}
+.agent-card>.row .avatar{width:96px;height:96px;border-radius:23px;box-shadow:0 8px 40px color-mix(in srgb,var(--agent) 12%,transparent)}
+.agent-card h2{font-size:22px;letter-spacing:2px;margin-top:23px}
+.agent-card p{font-size:13px;color:#bdc9de}
+.capability-label{font-size:8px;letter-spacing:1.5px}
+.history{font-size:12px;line-height:1.8;border:1px solid #ffffff06;padding:16px}
+.history b{font-weight:500;color:#c6d5ee}
+.chips{gap:7px}
+.mission-layout{grid-template-columns:minmax(250px,.75fr) minmax(0,1.65fr);align-items:start}
+.mission-list button{padding:20px;background:linear-gradient(135deg,#14223999,#0b1425);box-shadow:0 5px 20px #0001;min-height:145px}
+.selected-wrapper .mission-link{border-color:#6bdaff66;box-shadow:inset 3px 0 #67dfff,0 0 25px #65d4ff08;background:linear-gradient(130deg,#163249,#141b34)}
+.mission-detail{padding:28px}
+.mission-detail>h2{font-size:23px;letter-spacing:-.5px;margin:12px 0 21px}
+.phase-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:24px 0}
+.phase{position:relative;padding:16px 12px;border-radius:10px;background:#91b2ff05;border:1px solid #8ba9df18}
+.phase span{display:grid;place-items:center;width:27px;height:27px;border:1px solid #83a4dd30;border-radius:8px;font-size:10px;color:#a3b1ce;margin-bottom:9px}
+.phase b{display:block;font-size:11px;font-weight:600}
+.phase small{display:block;font-size:9px;letter-spacing:0;margin-top:4px}
+.phase-done{background:#5ce2bc08;border-color:#70d9ad25}
+.phase-done span{color:#91f1ce;border-color:#70d9ad55}
+.phase-running{background:#62d9ff09;border-color:#62d9ff40}
+.phase-running span{color:#80e6ff;border-color:#62d9ff60}
+.phase-blocked{border-color:#edbd7040}
+.phase-failed{border-color:#ff8aa140}
+.task{padding:21px 0}
+.task>.row{gap:14px}
+.task .number{width:34px;height:34px;border:1px solid #7aa7dc24;background:#14213b}
+.task-done .number{color:#95efd0;background:#68d5ad10}
+.task-running .number{color:#84eaff;box-shadow:0 0 16px #61d9ff15}
+.task h3{font-size:14px}
+.task p{font-size:12px;margin:10px 0}
+.task .actions button{font-size:11px}
+.result{background:linear-gradient(120deg,#60d9b711,#76a8fa07);padding:22px}
+.tabs button[aria-pressed=true]{background:#53d5f315;border-color:#63cee675}
+.chat-layout{grid-template-columns:205px minmax(0,1fr);gap:20px}
+.chat-agents{padding:16px 12px;background:#0d1628}
+.chat-agents h2{padding:7px 8px 14px;font-size:13px;color:#b6c7e4}
+.chat-agents button{border-color:transparent;background:transparent;padding:12px 10px;font-size:11px}
+.chat-agents .avatar{width:40px;height:40px;border-radius:11px}
+.chat-agents button[aria-pressed=true]{background:linear-gradient(100deg,#21465a66,#29234344);border-color:#74d9f135;box-shadow:inset 2px 0 #70e0f6}
+.chat-panel{min-height:650px;padding:25px 28px;background:radial-gradient(ellipse at 80% 0,#6245bb0e,transparent 60%),#0d1526}
+.chat-panel>.section-head{padding-bottom:20px;border-bottom:1px solid #91b2ff12}
+.chat-panel>.section-head .avatar{width:50px;height:50px}
+.chat-empty{padding:40px 15px}
+.chat-empty .avatar{width:100px;height:100px;border-radius:25px;box-shadow:0 0 50px #5cd9ff14}
+.chat-empty h2{font-size:27px;letter-spacing:-.7px;margin-top:24px}
+.chat-empty p{font-size:13px;line-height:1.9}
+.chat-empty .actions{margin-top:26px}
+.message{position:relative;border-radius:16px;font-size:14px;line-height:1.9;padding:20px 23px;max-width:88%;background:linear-gradient(145deg,#18243b,#121c30);border-color:#a0bdf712;margin:16px 0;box-shadow:0 8px 24px #0001}
+.message.assistant{padding-left:67px}
+.message>.avatar{position:absolute;left:17px;top:19px;width:34px;height:34px;border-radius:10px}
+.message small{font-size:9px;letter-spacing:1.3px;color:#8ce6f7}
+.message.user{background:linear-gradient(125deg,#18364b,#222843);border-color:#72d4ee25;margin-left:auto;max-width:80%}
+.composer{background:#080f20;border-color:#6f97c044;box-shadow:0 0 25px #79b8ff06;border-radius:15px;padding:16px}
+.composer:focus-within{border-color:#73ddef88;box-shadow:0 0 0 3px #62d9ff09}
+.composer textarea{font-size:14px;line-height:1.7;min-height:70px}
+.composer textarea:focus-visible{outline:none}
+.composer label{margin-bottom:8px}
+.chat .typing{padding:12px 0;color:#a0dfed}
+.core-mini{border-color:#7bb9f223;background:linear-gradient(130deg,#13283a,#181d35);box-shadow:0 0 25px #81cfff05}
+dialog{background:linear-gradient(135deg,#19253deb,#0d1629f7);box-shadow:0 30px 120px #000a;border-color:#85c2f53b}
+dialog::backdrop{background:#030712bb;backdrop-filter:blur(7px)}
+.mobile-nav-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.mobile-nav-grid a{display:flex;gap:10px;align-items:center;padding:16px;min-height:64px}
+.mobile-nav-grid span{color:var(--cyan)}
+#mobile-menu{display:none}
+.disclaimer{color:#9babca;font-size:11px}
+.subtle,.muted{color:#a4b2cc}
+.badge{color:#91eaff}
+.tag.status-blocked{color:#f7d495}
+.tag.status-done{color:#95efcd}
+.tag.status-failed{color:#ffb0bd}
+button:focus-visible,a:focus-visible{outline:2px solid #b1f4ff;outline-offset:4px}
+#view{animation:surface-in .25s ease-out}
+@keyframes surface-in{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(min-width:1600px){
+main{padding-left:48px;padding-right:48px}
+.hero{min-height:365px;padding:40px 45px}
+.command-orbit{transform:scale(1.08)}
+.hero-title{font-size:43px}
+}
+@media(max-width:1200px){
+.hero{padding:28px;grid-template-columns:1.1fr 1fr}
+.command-orbit{max-width:300px;transform:scale(.9)}
+.hero-title{font-size:30px}
+.hero-label{font-size:7px}
+.node-1,.node-2{right:0}
+.node-4,.node-5{left:0}
+.agent-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mission-layout{grid-template-columns:1fr}
+.mission-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
+@media(max-width:950px){
+.hero{grid-template-columns:1fr;min-height:0}
+.command-orbit{position:absolute;right:-40px;top:40px;opacity:.17;z-index:-1;transform:scale(1.1)}
+.hero-copy{max-width:550px}
+.hero p{max-width:360px}
+.hero-title{max-width:420px}
+.chat-layout{grid-template-columns:1fr}
+.chat-agents{display:flex;padding:8px;gap:6px}
+.chat-agents h2{display:none}
+.chat-agents button{flex-shrink:0;width:auto;margin:0;padding:8px}
+.chat-agents .avatar{width:32px;height:32px}
+.chat-panel{min-height:570px}
+.agent-card>.row .avatar{width:78px;height:78px}
+.agent-card>.row{flex-wrap:wrap}
+}
+@media(max-width:650px){
+aside{box-shadow:0 5px 20px #0002}
+.brand{letter-spacing:2px}
+.brand:after{color:#a2b0cb;position:absolute}
+nav{gap:4px;margin-top:12px}
+nav a{min-height:44px;padding:11px 13px;font-size:11px}
+header .row{gap:6px}
+.slash{margin:0 4px}
+#mobile-menu{padding:6px 12px;font-size:18px}
+#notifications{padding:6px 12px}
+.heading h1{line-height:1.25}
+.heading>.tag{font-size:8px}
+.hero-title{font-size:31px;line-height:1.2;margin-top:20px;max-width:100%}
+.hero-label{font-size:7px;letter-spacing:1.7px;line-height:1.7;margin-bottom:17px}
+.hero p{font-size:12px;line-height:1.8;max-width:100%}
+.hero .eyebrow{font-size:8px;letter-spacing:1.7px}
+.hero .actions{gap:9px}
+.hero .actions>*{flex:1;padding:11px 8px;font-size:11px;white-space:nowrap}
+.command-orbit{display:block;right:-95px;top:-85px;opacity:.07;transform:scale(1.4)}
+.orbit-core,.orbit-node{display:none}
+.stats{gap:10px}
+.stat .metric-top span{line-height:1.5}
+.agent-strip{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.agent-tile{border-radius:11px}
+.agent-tile .avatar{width:48px;height:48px;border-radius:13px;margin-bottom:12px}
+.agent-tile strong{letter-spacing:.7px}
+.agent-tile small{letter-spacing:0}
+.section-title .subtle{display:none}
+.panel{padding:20px}
+.mission-meta{gap:7px}
+.agent-card{padding:24px}
+.agent-card>.row .avatar{width:92px;height:92px}
+.agent-card h2{font-size:23px}
+.agent-card .actions>button{flex:1}
+.mission-list{grid-template-columns:1fr;gap:0}
+.mission-list button{min-height:125px;padding:18px}
+.phase-track{gap:6px;margin:20px 0}
+.task .row{gap:10px}
+.task .tag{margin-left:44px}
+.task .actions{gap:7px}
+.task .actions button{padding:10px;flex:auto}
+.chat-panel>.section-head{gap:8px}
+.chat-panel .subtle{font-size:10px}
+.chat-empty .actions button{width:100%}
+.message.assistant{padding-left:16px;padding-top:63px}
+.message.user{max-width:90%}
+.composer button{padding:10px 12px}
+.chat-panel> .row:last-child{flex-wrap:wrap;gap:4px}
+.two>.panel h2{overflow-wrap:anywhere}
+input,select,textarea{font-size:16px}
+.form-hint{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+.agent-card:hover,.agent-tile:hover,button:hover{transform:none!important}
+}
+.progress-row>span,.progress-row>b{min-width:36px;white-space:nowrap;text-align:right;flex-shrink:0}
+.progress-row progress{min-width:0;flex:1}
+.message small{white-space:normal}
+html{overflow-y:scroll}
+#view{min-height:calc(100dvh - 76px)}
+@media(max-width:650px){
+nav{min-height:50px}
+#view{min-height:calc(100dvh - 68px)}
+}
+.bottom-nav,.mobile-core,.mobile-mission-picker{display:none}
+aside nav{display:block}
+.bottom-nav a,.bottom-nav button{touch-action:manipulation}
+.avatar img{transition:filter .18s,transform .18s}
+.agent-tile:hover .avatar img{filter:brightness(1.16);transform:scale(1.035)}
+.avatar{isolation:isolate}
+.task .actions button{touch-action:manipulation}
+.message{overflow-wrap:anywhere}
+.chat{overscroll-behavior:contain;scrollbar-width:thin}
+.composer textarea{scrollbar-width:thin}
+.bottom-nav [aria-current=page],.bottom-nav .active{color:#a4f1ff}
+.bottom-nav :focus-visible{outline:2px solid #a4f1ff;outline-offset:-3px}
+.mobile-nav-grid a{font-size:14px}
+.task .subtle{font-size:12px}
+.status-pending{color:#c4d1e9}
+.mission-detail .task p{line-height:1.7}
+dialog{overscroll-behavior:contain;max-height:calc(var(--app-height,100dvh) - 40px)}
+@media(max-width:650px){
+html{scroll-padding-bottom:100px}
+body{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
+aside{position:relative;height:54px;min-height:54px;padding:14px 17px 10px;backdrop-filter:none;background:#0a1122;border-bottom:1px solid #ffffff09;z-index:3}
+aside nav,aside small,aside footer{display:none!important}
+.brand:after{content:'MOBILE FIRST / 05';right:17px;top:23px;font-size:8px;letter-spacing:1.3px}
+.brand{font-size:20px}
+.brand b{font-size:25px}
+main{padding:0 16px 22px}
+header{height:58px;min-height:58px}
+header>span{font-size:9px}
+#mobile-menu{display:none}
+#notifications{min-width:44px;min-height:44px}
+header .badge{font-size:9px}
+.heading{margin:24px 0 20px}
+.heading h1{font-size:27px}
+.heading p{font-size:13px;line-height:1.6}
+.heading>.tag{display:none}
+.eyebrow{font-size:10px;letter-spacing:1.8px}
+.hero{padding:20px;min-height:0;border-radius:19px;background:radial-gradient(ellipse at 100% 0%,#6045ac33,transparent 70%),linear-gradient(125deg,#12243a,#0d162e)}
+.hero-copy>.eyebrow,.hero-copy>.hero-title,.hero-label,.hero-copy>p,.command-orbit{display:none}
+.hero-copy{display:contents}
+.hero .actions{margin-top:18px;order:2}
+.hero{display:flex;flex-direction:column}
+.hero .actions>button,.hero .actions>a{min-height:46px;font-size:12px}
+.mobile-core{display:block;order:1}
+.mobile-core-main{display:flex;align-items:center;gap:14px}
+.mobile-core-main>.avatar{width:66px;height:66px;border-radius:18px;border-color:#73dff666;box-shadow:0 0 22px #64daff12}
+.mobile-core-main .eyebrow{font-size:9px;letter-spacing:2px}
+.mobile-core-main strong{display:block;font-size:18px;line-height:1.4;letter-spacing:-.4px;margin:4px 0}
+.mobile-core-main small{font-size:11px;letter-spacing:0;display:block;color:#a9bbd8}
+.mobile-core-team{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;border-top:1px solid #91b2ff17;padding-top:16px;margin-top:16px}
+.mobile-core-team>span{min-width:0;text-align:center}
+.mobile-core-team .avatar{width:36px;height:36px;border-radius:10px;margin:auto}
+.mobile-core-team small{font-size:8px;letter-spacing:0;display:block;margin-top:6px;color:#b9c8e0}
+.stats{margin:14px 0 25px}
+.stat{padding:16px}
+.stat .metric-top span{font-size:12px}
+.stat>span{font-size:11px;line-height:1.5}
+.stat strong{font-size:29px}
+.agent-tile{min-height:127px;padding:14px 3px}
+.agent-tile small{font-size:9px;line-height:1.4}
+.agent-tile strong{font-size:10px}
+.section-title a{font-size:12px;min-height:44px;display:flex;align-items:center}
+.section-title{gap:8px;margin:20px 0 10px}
+.section-title h2{font-size:17px}
+.tag{font-size:11px}
+.badge{font-size:10px}
+.subtle,.muted{font-size:12px;line-height:1.65}
+.panel{border-radius:16px}
+.section-head{gap:10px}
+.section-head h2{font-size:17px}
+.section-head>.button{font-size:11px;padding:10px}
+.mission-meta{font-size:12px}
+.mission-meta .tag{font-size:10px}
+.mission-link h3{font-size:14px}
+.progress-row{font-size:12px}
+.event p{font-size:13px}
+.event time{font-size:11px}
+.bottom-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;position:fixed;z-index:12;left:0;right:0;bottom:0;margin:0;padding:7px max(5px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(5px,env(safe-area-inset-left,0px));min-height:74px;border-top:1px solid #7596cb33;background:#0b1325f5;box-shadow:0 -10px 35px #0004;backdrop-filter:blur(14px);overflow:visible}
+.bottom-nav a,.bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin:0;padding:6px 0;min-height:52px;min-width:0;border:0;border-radius:11px;background:transparent;box-shadow:none;color:#a7b5cf;font-size:11px;text-decoration:none}
+.bottom-nav span{font-size:20px;line-height:23px;letter-spacing:0}
+.bottom-nav b{font-size:10px;font-weight:500;line-height:15px}
+.bottom-nav a[aria-current=page],.bottom-nav button.active{background:linear-gradient(135deg,#2a617140,#49396b38);color:#9ceeff;box-shadow:inset 0 1px #75d9f12b}
+.bottom-nav a:hover,.bottom-nav button:hover{transform:none;background:#90cfff10}
+.bottom-nav a[aria-current=page] b{font-weight:650}
+#toast{bottom:calc(91px + env(safe-area-inset-bottom,0px));right:16px;left:16px;max-width:none;font-size:13px}
+dialog{padding:22px;border-radius:22px;margin:auto 12px calc(90px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-height:calc(var(--app-height,100dvh) - 130px)}
+.mobile-nav-grid{grid-template-columns:1fr;gap:10px}
+.mobile-nav-grid a{min-height:58px;font-size:15px;justify-content:flex-start}
+.mobile-nav-grid span{font-size:23px}
+.mobile-mission-picker{display:block;margin:0 0 16px;padding:17px;background:#121e33;border:1px solid #91b2ff20;border-radius:14px}
+.mobile-mission-picker label{color:#b9cbe6;font-size:12px;margin-bottom:8px}
+.mobile-mission-picker select{min-height:48px;margin:0;font-size:14px;max-width:100%}
+.mission-list{display:none}
+.mission-layout{display:block}
+.mission-detail{padding:20px}
+.mission-detail>h2{font-size:23px}
+.mission-detail .phase-track{gap:7px}
+.phase{padding:13px 10px}
+.phase b{font-size:11px}
+.phase small{font-size:10px;line-height:1.5}
+.phase span{width:30px;height:30px;font-size:12px}
+.task{padding:23px 0}
+.task>.row{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px}
+.task>.row>.tag{grid-column:2;margin:0;justify-self:start}
+.task h3{font-size:15px;line-height:1.45}
+.task .eyebrow{font-size:10px}
+.task p{font-size:12px;margin:12px 0}
+.task .actions{display:flex;flex-wrap:wrap}
+.task .actions>.primary{width:100%;flex-basis:100%;font-size:13px;min-height:48px}
+.task .actions>button{min-height:46px;flex:1;font-size:12px}
+.result h3{font-size:15px}
+.result p{font-size:13px;line-height:1.7}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.tabs button{font-size:11px;padding:10px 3px;min-height:44px}
+.agent-card p{font-size:14px}
+.chips .tag{font-size:11px}
+.history{font-size:13px}
+.capability-label{font-size:9px}
+.disclaimer{font-size:10px;line-height:1.7}
+.keyboard-open .bottom-nav{display:none}
+.keyboard-open #toast{bottom:15px}
+body[data-page="NEXO Chat"]{height:var(--app-height,100dvh);min-height:0;overflow:hidden;padding-bottom:0}
+body[data-page="NEXO Chat"] main{height:calc(var(--app-height,100dvh) - 54px);display:flex;flex-direction:column;padding:0 12px calc(83px + env(safe-area-inset-bottom,0px));min-height:0}
+body[data-page="NEXO Chat"] header{flex:0 0 52px;height:52px;min-height:52px}
+body[data-page="NEXO Chat"] #view{flex:1;min-height:0;display:flex;flex-direction:column;animation:none}
+body[data-page="NEXO Chat"] #view>.heading,body[data-page="NEXO Chat"] main>.disclaimer{display:none}
+.chat-layout{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.chat-agents{display:flex;flex:0 0 58px;overflow:auto;padding:4px 0;margin:0;border:0;background:transparent;min-height:58px;border-radius:0;gap:6px}
+.chat-agents button{flex:0 0 auto;padding:6px 10px;min-height:48px;margin:0;border-radius:12px}
+.chat-agents button span{font-size:11px}
+.chat-agents .avatar{width:30px;height:30px}
+.chat-panel{flex:1;min-height:0;padding:13px;display:flex;flex-direction:column;border-radius:18px;overflow:hidden}
+.chat-panel>.section-head{flex-shrink:0;padding-bottom:10px;margin-bottom:0}
+.chat-panel>.section-head .avatar{width:36px;height:36px;border-radius:10px}
+.chat-panel>.section-head .subtle{font-size:10px}
+.chat-panel>.section-head b{font-size:14px}
+.chat-panel>.section-head .tag{font-size:9px}
+.chat{flex:1;min-height:0;max-height:none;overflow-y:auto;padding:7px 0;scroll-padding:12px}
+.chat-empty{padding:20px 4px}
+.chat-empty .avatar{width:56px;height:56px;border-radius:16px}
+.chat-empty h2{font-size:22px;margin-top:15px}
+.chat-empty p{font-size:12px;line-height:1.6}
+.chat-empty .actions{margin-top:14px;gap:7px}
+.chat-empty .actions button{font-size:12px;min-height:44px}
+.message{font-size:14px;line-height:1.7;margin:12px 0;padding:15px;max-width:96%}
+.message.assistant{padding:55px 15px 15px}
+.message small{font-size:10px;letter-spacing:.6px}
+.message>.avatar{width:29px;height:29px;top:13px;left:14px}
+.composer{flex-shrink:0;padding:10px 12px;border-radius:14px;margin-top:7px}
+.composer label{display:none}
+.composer textarea{font-size:16px;line-height:1.5;min-height:44px;height:48px;max-height:110px;padding:4px 0;resize:none;margin:0;overflow:auto}
+.composer .row{align-items:center;margin-top:5px}
+.composer .row .muted{font-size:9px;line-height:1.45;max-width:160px}
+.composer button{font-size:12px;min-height:44px;min-width:78px}
+.chat-panel>.row:last-child{flex-shrink:0;margin-top:3px!important;gap:4px;flex-wrap:nowrap}
+.chat-panel>.row:last-child>.subtle{font-size:9px}
+.chat-panel>.row:last-child button{font-size:9px;min-height:32px;padding:4px 7px}
+.chat-panel>.error{font-size:12px;margin:5px 0;padding:8px;flex-shrink:0}
+.chat-panel>.error button{min-height:40px;font-size:11px}
+body.keyboard-open[data-page="NEXO Chat"] aside{display:none}
+body.keyboard-open[data-page="NEXO Chat"] main{height:var(--app-height,100dvh);padding-bottom:max(5px,env(safe-area-inset-bottom,0px))}
+body.keyboard-open[data-page="NEXO Chat"] header{display:none}
+body.keyboard-open[data-page="NEXO Chat"] .chat-agents{display:none}
+body.keyboard-open[data-page="NEXO Chat"] .chat-panel>.row:last-child{display:none}
+body.keyboard-open[data-page="NEXO Chat"] .chat-layout{padding-top:6px}
+body.keyboard-open[data-page="NEXO Chat"] .chat-panel>.section-head .subtle{display:none}
+}
+@media(max-width:370px){
+.mobile-core-main{gap:10px}
+.mobile-core-main strong{font-size:16px}
+.mobile-core-main>.avatar{width:56px;height:56px}
+.mobile-core-team{gap:4px}
+.mobile-core-team .avatar{width:32px;height:32px}
+.bottom-nav b{font-size:9px}
+.bottom-nav span{font-size:19px}
+.hero .actions>button,.hero .actions>a{font-size:11px}
+.agent-tile small{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.avatar img,.agent-tile:hover .avatar img{transform:none!important;filter:none!important}
+}
+@media(max-width:650px){
+body[data-page="NEXO Chat"] #view>.heading{display:block;position:absolute;width:1px;height:1px;padding:0;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.bottom-nav button[aria-expanded="true"]{color:#a4f1ff}
+}
+@media(max-width:650px){.chat-agents{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}.chat-agents::-webkit-scrollbar{display:none}}
+
+.foundation-panel{margin-top:20px}.foundation-grid{display:grid;grid-template-columns:1fr 1fr;gap:25px}.foundation-panel select{margin-bottom:12px}.foundation-panel .actions{gap:8px}.approval-preview{white-space:pre-wrap;overflow-wrap:anywhere;background:#080f20;padding:16px;border:1px solid #8dbfff26;border-radius:10px;max-height:220px;overflow:auto}.approval-check{display:flex;align-items:flex-start;gap:10px;margin:18px 0}.approval-check input{width:20px;height:20px;flex-shrink:0;margin:2px 0}.tool-status{font-size:10px;color:#a4b9d5;padding:7px 2px;line-height:1.4}.message-state{display:block;margin-top:8px;color:#b9c5dc}#session-notice{padding:12px 15px;border:1px solid #e2b45c55;background:#5c431326;color:#ffdc9e;border-radius:10px;margin:12px 0;font-size:12px}#session-notice[hidden]{display:none}#cancel-stream{border-color:#dda6c660;color:#f9c8dd}.foundation-panel h2{font-size:18px}
+@media(max-width:650px){.foundation-grid{grid-template-columns:1fr;gap:20px}.foundation-panel .section-head{align-items:flex-start;flex-direction:column}.foundation-panel button{min-height:44px}.tool-status{font-size:9px;flex-shrink:0}.composer #cancel-stream{padding:8px;font-size:10px;min-width:65px}.composer:has(#cancel-stream) .muted{display:none}#session-notice{margin:5px 0;font-size:11px;padding:8px;flex-shrink:0}body[data-page="NEXO Chat"] #session-notice:not([hidden]){max-height:65px;overflow:auto}}
+
+.service-refresh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}.service-refresh button{min-height:44px}body[data-page="NEXO Chat"] .service-refresh{display:none}
+
+@media(max-width:650px){.brand:after{content:'FOUNDATION / 06'}}
+
+/* NEXO Voice preview. Scoped to avoid changing existing screens. */
+.nexo-voice-shortcut{display:inline-flex;gap:7px;align-items:center;white-space:nowrap;padding:9px 14px;border:1px solid rgba(73,213,244,.5);border-radius:999px;background:linear-gradient(125deg,rgba(15,64,100,.9),rgba(66,36,124,.8));color:#edfbff;font-size:12px;font-weight:800;box-shadow:0 0 18px rgba(0,202,255,.13);cursor:pointer}
+.nexo-voice-shortcut:hover,.voice-chat-button:hover{box-shadow:0 0 24px rgba(58,208,255,.29);border-color:#5bdcff}
+.voice-chat-action{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.voice-chat-button{border:1px solid rgba(88,209,254,.38);background:rgba(28,95,134,.3);color:#d6faff;border-radius:10px;padding:9px 12px;cursor:pointer}
+.voice-dialog{position:fixed;inset:0;margin:auto;width:min(550px,calc(100vw - 20px));max-width:550px;max-height:min(94dvh,880px);padding:0;border:1px solid rgba(77,215,255,.4);border-radius:24px;background:#081428;color:#eaf6ff;box-shadow:0 28px 90px rgba(0,0,0,.78),0 0 90px rgba(24,139,237,.14);overflow:auto;overscroll-behavior:contain}
+.voice-dialog::backdrop{background:rgba(1,4,14,.83);backdrop-filter:blur(12px)}.voice-shell{padding:24px;display:flex;flex-direction:column;gap:15px;min-height:min(690px,90dvh);background:radial-gradient(ellipse at 50% 24%,rgba(21,110,170,.14),transparent 49%),radial-gradient(ellipse at 80% 50%,rgba(104,60,178,.08),transparent 50%)}
+.voice-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.voice-overline{font-size:10px;letter-spacing:2px;color:#58d7fb;font-weight:750}.voice-top h2{font-size:20px;margin:6px 0 0;color:#eff7ff}.voice-top button{width:36px;height:36px;padding:0;border:1px solid #34435a;color:#dce8fb;border-radius:12px;background:#1a263a;cursor:pointer;flex-shrink:0}
+.voice-stage{text-align:center;display:flex;align-items:center;flex-direction:column;gap:7px}.voice-halo{height:148px;width:148px;border-radius:50%;background:radial-gradient(circle,rgba(34,158,248,.24) 0%,rgba(97,67,185,.18) 45%,transparent 68%);border:1px dashed rgba(90,201,255,.37);display:grid;place-items:center;position:relative;box-shadow:0 0 50px rgba(33,129,254,.09)}.voice-halo img{width:112px;height:112px;object-fit:contain;position:relative;z-index:1;border-radius:50%}.voice-glow{position:absolute;inset:14px;border:1px solid rgba(92,215,255,.27);border-radius:50%}.voice-stage h3{font-size:23px;color:#f5fdff;margin:0}.voice-mode{font-size:9px;letter-spacing:1.8px;font-weight:800;color:#869cb8}.voice-wave{height:48px;width:100%;display:flex;justify-content:center;align-items:center;gap:3px}.voice-wave i{display:block;width:3px;height:var(--h);background:linear-gradient(#6e66ff,#2ad9ee);border-radius:10px;opacity:.75}.voice-dialog[data-voice-state="listening"] .voice-wave i,.voice-dialog[data-voice-state="speaking"] .voice-wave i{animation:voice-wave 1.05s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -32ms)}.voice-dialog[data-voice-state="listening"] .voice-halo,.voice-dialog[data-voice-state="speaking"] .voice-halo{box-shadow:0 0 48px rgba(63,183,255,.32),inset 0 0 16px rgba(63,183,255,.08)}
+.voice-stage #voice-status{font-weight:750;font-size:14px;margin:0;color:#e9f4ff}.voice-stage #voice-subtitle{max-width:390px;font-size:12px;line-height:1.6;margin:0;color:#a8bcdb}.voice-stage #voice-live{min-height:17px;max-width:100%;font-size:13px;color:#66dcfa;font-style:italic}
+.voice-history{min-height:100px;max-height:160px;overflow-y:auto;border:1px solid rgba(116,165,223,.14);border-radius:14px;padding:10px 12px;background:rgba(3,10,26,.55)}.voice-line{padding:7px 9px;margin:3px 0;border-radius:9px;max-width:98%;font-size:12px;line-height:1.55;overflow-wrap:anywhere}.voice-line.me{margin-left:12%;background:rgba(28,91,136,.29)}.voice-line.nexo{margin-right:8%;background:rgba(76,52,145,.22)}.voice-line-name{font-size:9px;letter-spacing:1.2px;font-weight:800;color:#68ddfa}.voice-line p{margin:2px 0 0;color:#e9f1ff;white-space:pre-wrap}
+.voice-text label{font-size:11px;color:#abc4e4;font-weight:700;display:block;margin-bottom:6px}.voice-text-row{display:flex;gap:8px}.voice-text input{flex:1;min-width:0;border-radius:12px;background:#0f2037;border:1px solid #314965;padding:11px;color:#fff;font-size:13px}.voice-text-row button{border-radius:11px;background:#146b92;color:#fff;border:1px solid #2893c2;padding:9px 16px;font-weight:800;cursor:pointer}.voice-settings{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;align-items:center;font-size:11px;color:#bdceeb}.voice-settings label{display:flex;align-items:center;gap:5px}.voice-settings select{background:#14253e;color:#e7f6ff;border:1px solid #39516b;border-radius:8px;padding:6px;font-size:11px}.voice-settings input{accent-color:#48cbed}.voice-controls{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px}.voice-controls button{min-height:45px;border-radius:12px;padding:8px 5px;font-weight:750;font-size:12px;color:#eaf5ff;border:1px solid rgba(110,160,210,.34);background:#18304c;cursor:pointer}.voice-controls .voice-mic{background:linear-gradient(120deg,#06658c,#313f99);border-color:#32ccf9}.voice-controls .voice-hangup{background:#8b234a;border-color:#e34b7c}.voice-controls button:disabled{opacity:.45;cursor:default}.voice-privacy{text-align:center;font-size:10px;line-height:1.55;color:#8296b5;margin:0}.voice-dialog button:focus-visible,.voice-dialog input:focus-visible,.voice-dialog select:focus-visible{outline:3px solid #7bdcff;outline-offset:2px}
+@keyframes voice-wave{0%{height:5px;opacity:.45}100%{height:var(--h);opacity:1}}
+@media(max-width:650px){.nexo-voice-shortcut span{display:none}.nexo-voice-shortcut{width:36px;height:36px;padding:4px;justify-content:center}.voice-dialog{width:100vw;max-width:none;max-height:100dvh;height:100dvh;border:0;border-radius:0}.voice-shell{min-height:100%;padding:max(14px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom));gap:12px}.voice-halo{width:115px;height:115px}.voice-halo img{width:91px;height:91px}.voice-history{flex:1;min-height:90px;max-height:20dvh}.voice-settings{gap:8px;justify-content:space-between}.voice-controls button{font-size:11px}.voice-stage{gap:5px}}
+@media(max-height:670px){.voice-halo{height:84px;width:84px}.voice-halo img{width:72px;height:72px}.voice-wave{height:23px}.voice-history{max-height:110px;min-height:54px}.voice-shell{gap:9px;padding-top:10px}.voice-privacy{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.voice-wave i{animation:none!important}.voice-dialog::backdrop{backdrop-filter:none}}
+
+</style><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="./icon.svg"></head><body><a class="skip" href="#view">Saltar para o conteúdo</a><aside><a class="brand" href="#Dashboard"><b>✦</b> NEXO<span>COMMAND CENTER</span></a><small>WORKSPACE / 07</small><nav aria-label="Navegação principal"></nav><footer><div class="core-mini">✦ <span>NEXO CORE<small>SIMULAÇÃO LOCAL</small></span><i></i></div><p>Backend Bridge · v0.7.3</p></footer></aside><main><header><span>WORKSPACE <span class="slash">/</span> <b id="crumb">Dashboard</b></span><div class="row"><span class="badge">PREVIEW ONLINE · DEMO</span><button id="nexo-voice-open" class="nexo-voice-shortcut" type="button" aria-label="Iniciar chamada NEXO Voice" title="Iniciar chamada NEXO Voice">◉ <span>Chamar NEXO</span></button><button id="notifications" aria-label="Abrir notificações">♧ <span id="unread">2</span></button><button id="mobile-menu" aria-label="Abrir menu de navegação">☰</button><span class="user-avatar" aria-label="Perfil demonstrativo">NX</span></div></header><div id="session-notice" role="status" hidden></div><div id="storage-warning" role="alert" hidden></div><div id="view" tabindex="-1"></div><div class="disclaimer">◉ Demonstração pública · Dados fictícios guardados apenas neste navegador · Sem ligação a Railway, Gmail ou IA real</div></main><nav class="bottom-nav" aria-label="Navegação mobile"></nav><dialog id="modal" aria-labelledby="modal-title"></dialog><div id="toast" role="status"></div><script>
+window.NexoAvatarData={"nexo":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iIzYyZTZmZiIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjNjJlNmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNjJlNmZmIiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iIzYyZTZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiM2MmU2ZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjJlNmZmIiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik02NCA0MCBMODggNjAgODggODYgNjQgMTA2IDQwIDg2IDQwIDYwWiIgZmlsbD0idXJsKCNtZXRhbCkiIHN0cm9rZT0idXJsKCNlZGdlKSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNNDMgNTdRNjQgNDkgODUgNTdMODIgNzdRNjQgODUgNDYgNzdaIiBmaWxsPSIjMDgwZjIwIi8+PHBhdGggZD0iTTQ5IDY1TDYxIDcwIDQ5IDc0TTc5IDY1TDY3IDcwIDc5IDc0IiBzdHJva2U9IiM2MmU2ZmYiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIiBvcGFjaXR5PSIuNyIvPjxwYXRoIGQ9Ik00OSA2NUw2MSA3MCA0OSA3NE03OSA2NUw2NyA3MCA3OSA3NCIgc3Ryb2tlPSIjNjJlNmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik01NSA4OEw2NCA5MiA3MyA4OE02NCA0MVY0OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjJlNmZmIiBzdHJva2Utb3BhY2l0eT0iLjciLz48Y2lyY2xlIGN4PSI2NCIgY3k9IjExNyIgcj0iMyIgZmlsbD0iIzYyZTZmZiIvPjxwYXRoIGQ9Ik02IDY1SDE3TTExMSA2NUgxMjIiIHN0cm9rZT0iIzYyZTZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii40Ii8+PC9zdmc+","atlas":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iIzdhYTJmZiIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjN2FhMmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2FhMmZmIiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iIzdhYTJmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiM3YWEyZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjN2FhMmZmIiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik00MCA0OCBRNjQgMjkgODggNDggTDg0IDkwIDY0IDEwNSA0NCA5MFoiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9InVybCgjZWRnZSkiIHN0cm9rZS13aWR0aD0iMS41Ii8+PHBhdGggZD0iTTQzIDU3UTY0IDQ5IDg1IDU3TDgyIDc3UTY0IDg1IDQ2IDc3WiIgZmlsbD0iIzA4MGYyMCIvPjxwYXRoIGQ9Ik00NiA2NUg2ME02OCA2NUg4MiIgc3Ryb2tlPSIjN2FhMmZmIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIGZpbHRlcj0idXJsKCNnbG93KSIgb3BhY2l0eT0iLjciLz48cGF0aCBkPSJNNDYgNjVINjBNNjggNjVIODIiIHN0cm9rZT0iIzdhYTJmZiIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNNTUgODhMNjQgOTIgNzMgODhNNjQgNDFWNDkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhYTJmZiIgc3Ryb2tlLW9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iNjQiIGN5PSIxMTciIHI9IjMiIGZpbGw9IiM3YWEyZmYiLz48cGF0aCBkPSJNNiA2NUgxN00xMTEgNjVIMTIyIiBzdHJva2U9IiM3YWEyZmYiIHN0cm9rZS1vcGFjaXR5PSIuNCIvPjwvc3ZnPg==","lyra":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iI2Y1OWZjZSIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjZjU5ZmNlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZjU5ZmNlIiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iI2Y1OWZjZSIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmNTlmY2UiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjU5ZmNlIiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik02NCAzNCBDMTAwIDQwIDk4IDgzIDY0IDEwNiBDMzAgODMgMjggNDAgNjQgMzRaIiBmaWxsPSJ1cmwoI21ldGFsKSIgc3Ryb2tlPSJ1cmwoI2VkZ2UpIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxwYXRoIGQ9Ik00MyA1N1E2NCA0OSA4NSA1N0w4MiA3N1E2NCA4NSA0NiA3N1oiIGZpbGw9IiMwODBmMjAiLz48cGF0aCBkPSJNNDYgNjVRNTUgNTcgNjQgNjVRNzMgNTcgODIgNjUiIHN0cm9rZT0iI2Y1OWZjZSIgc3Ryb2tlLXdpZHRoPSI1IiBmaWxsPSJub25lIiBmaWx0ZXI9InVybCgjZ2xvdykiIG9wYWNpdHk9Ii43Ii8+PHBhdGggZD0iTTQ2IDY1UTU1IDU3IDY0IDY1UTczIDU3IDgyIDY1IiBzdHJva2U9IiNmNTlmY2UiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTU1IDg4TDY0IDkyIDczIDg4TTY0IDQxVjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmNTlmY2UiIHN0cm9rZS1vcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iMTE3IiByPSIzIiBmaWxsPSIjZjU5ZmNlIi8+PHBhdGggZD0iTTYgNjVIMTdNMTExIDY1SDEyMiIgc3Ryb2tlPSIjZjU5ZmNlIiBzdHJva2Utb3BhY2l0eT0iLjQiLz48L3N2Zz4=","nova":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iI2M3OWJmZiIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjYzc5YmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYzc5YmZmIiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iI2M3OWJmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiNjNzliZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzc5YmZmIiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik02NCAzNCBROTYgNDUgODggODIgTDY0IDEwNiA0MCA4MiBRMzIgNDUgNjQgMzRaIiBmaWxsPSJ1cmwoI21ldGFsKSIgc3Ryb2tlPSJ1cmwoI2VkZ2UpIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxwYXRoIGQ9Ik00MyA1N1E2NCA0OSA4NSA1N0w4MiA3N1E2NCA4NSA0NiA3N1oiIGZpbGw9IiMwODBmMjAiLz48cGF0aCBkPSJNNDggNjZMNTYgNTkgNjQgNjYgNzIgNTkgODAgNjYiIHN0cm9rZT0iI2M3OWJmZiIgc3Ryb2tlLXdpZHRoPSI1IiBmaWxsPSJub25lIiBmaWx0ZXI9InVybCgjZ2xvdykiIG9wYWNpdHk9Ii43Ii8+PHBhdGggZD0iTTQ4IDY2TDU2IDU5IDY0IDY2IDcyIDU5IDgwIDY2IiBzdHJva2U9IiNjNzliZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTU1IDg4TDY0IDkyIDczIDg4TTY0IDQxVjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiNjNzliZmYiIHN0cm9rZS1vcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iMTE3IiByPSIzIiBmaWxsPSIjYzc5YmZmIi8+PHBhdGggZD0iTTYgNjVIMTdNMTExIDY1SDEyMiIgc3Ryb2tlPSIjYzc5YmZmIiBzdHJva2Utb3BhY2l0eT0iLjQiLz48L3N2Zz4=","sentinel":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iIzcyZTRiMyIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjNzJlNGIzIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzJlNGIzIiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iIzcyZTRiMyIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiM3MmU0YjMiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzJlNGIzIiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik02NCAzNSBMOTMgNDkgODYgODggNjQgMTA4IDQyIDg4IDM1IDQ5WiIgZmlsbD0idXJsKCNtZXRhbCkiIHN0cm9rZT0idXJsKCNlZGdlKSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNNDMgNTdRNjQgNDkgODUgNTdMODIgNzdRNjQgODUgNDYgNzdaIiBmaWxsPSIjMDgwZjIwIi8+PHBhdGggZD0iTTQ2IDY1TDU3IDcwIDY0IDYxIDcxIDcwIDgyIDY1IiBzdHJva2U9IiM3MmU0YjMiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIiBvcGFjaXR5PSIuNyIvPjxwYXRoIGQ9Ik00NiA2NUw1NyA3MCA2NCA2MSA3MSA3MCA4MiA2NSIgc3Ryb2tlPSIjNzJlNGIzIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik01NSA4OEw2NCA5MiA3MyA4OE02NCA0MVY0OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzJlNGIzIiBzdHJva2Utb3BhY2l0eT0iLjciLz48Y2lyY2xlIGN4PSI2NCIgY3k9IjExNyIgcj0iMyIgZmlsbD0iIzcyZTRiMyIvPjxwYXRoIGQ9Ik02IDY1SDE3TTExMSA2NUgxMjIiIHN0cm9rZT0iIzcyZTRiMyIgc3Ryb2tlLW9wYWNpdHk9Ii40Ii8+PC9zdmc+","forge":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmYjU3OCIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjZmZiNTc4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZiNTc4IiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iI2ZmYjU3OCIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmI1NzgiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZiNTc4IiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik00MiA0NCBMODYgNDQgOTYgNTkgODYgOTIgNjQgMTA0IDQyIDkyIDMyIDU5WiIgZmlsbD0idXJsKCNtZXRhbCkiIHN0cm9rZT0idXJsKCNlZGdlKSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNNDMgNTdRNjQgNDkgODUgNTdMODIgNzdRNjQgODUgNDYgNzdaIiBmaWxsPSIjMDgwZjIwIi8+PHBhdGggZD0iTTQ1IDYyTDU5IDY4IDQ1IDcyTTgzIDYyTDY5IDY4IDgzIDcyIiBzdHJva2U9IiNmZmI1NzgiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIiBvcGFjaXR5PSIuNyIvPjxwYXRoIGQ9Ik00NSA2Mkw1OSA2OCA0NSA3Mk04MyA2Mkw2OSA2OCA4MyA3MiIgc3Ryb2tlPSIjZmZiNTc4IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik01NSA4OEw2NCA5MiA3MyA4OE02NCA0MVY0OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZiNTc4IiBzdHJva2Utb3BhY2l0eT0iLjciLz48Y2lyY2xlIGN4PSI2NCIgY3k9IjExNyIgcj0iMyIgZmlsbD0iI2ZmYjU3OCIvPjxwYXRoIGQ9Ik02IDY1SDE3TTExMSA2NUgxMjIiIHN0cm9rZT0iI2ZmYjU3OCIgc3Ryb2tlLW9wYWNpdHk9Ii40Ii8+PC9zdmc+","immo":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iI2YxYzg3OCIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjZjFjODc4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZjFjODc4IiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iI2YxYzg3OCIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMWM4NzgiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjFjODc4IiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik00MCA1MyBMNjQgMzIgODggNTMgODYgOTEgNjQgMTA0IDQyIDkxWiIgZmlsbD0idXJsKCNtZXRhbCkiIHN0cm9rZT0idXJsKCNlZGdlKSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNNDMgNTdRNjQgNDkgODUgNTdMODIgNzdRNjQgODUgNDYgNzdaIiBmaWxsPSIjMDgwZjIwIi8+PHBhdGggZD0iTTQ2IDcwTDU1IDYxIDY0IDcwIDczIDYxIDgyIDcwIiBzdHJva2U9IiNmMWM4NzgiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIiBvcGFjaXR5PSIuNyIvPjxwYXRoIGQ9Ik00NiA3MEw1NSA2MSA2NCA3MCA3MyA2MSA4MiA3MCIgc3Ryb2tlPSIjZjFjODc4IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik01NSA4OEw2NCA5MiA3MyA4OE02NCA0MVY0OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjFjODc4IiBzdHJva2Utb3BhY2l0eT0iLjciLz48Y2lyY2xlIGN4PSI2NCIgY3k9IjExNyIgcj0iMyIgZmlsbD0iI2YxYzg3OCIvPjxwYXRoIGQ9Ik02IDY1SDE3TTExMSA2NUgxMjIiIHN0cm9rZT0iI2YxYzg3OCIgc3Ryb2tlLW9wYWNpdHk9Ii40Ii8+PC9zdmc+"};
+</script><script>
+(function(root){
+const agents=[{id:'NEXO',role:'Orquestração',symbol:'✦',color:'#62e6ff',skills:['Contexto','Planeamento','Síntese']},{id:'ATLAS',role:'Estratégia & coordenação',symbol:'◈',color:'#7aa2ff',skills:['Objetivos','Prioridades','Coordenação']},{id:'NOVA',role:'Pesquisa & inteligência',symbol:'✧',color:'#c79bff',skills:['Pesquisa fictícia','Síntese','Comparação']},{id:'FORGE',role:'Engenharia & execução',symbol:'⌘',color:'#ffb578',skills:['Prototipagem','Revisão de UI','Documentação']},{id:'SENTINEL',role:'Qualidade & segurança',symbol:'⬡',color:'#72e4b3',skills:['Checklist','Revisão simulada','Consistência']},{id:'IMMO',role:'Pesquisa de alojamento',symbol:'⌂',color:'#f1c878',skills:['Critérios fictícios','Comparação','Resumo']},{id:'LYRA',role:'Conteúdo & comunicação',symbol:'✺',color:'#f59fce',skills:['Rascunhos','Tom de voz','Ideação']}];
+const clone=v=>JSON.parse(JSON.stringify(v));
+function mission(title,agent='ATLAS',priority='Normal'){return {id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),title,agent,priority,tasks:[{title:'Definir objetivo e critérios',agent,phase:'Planeamento',deps:[],status:'pending'},{title:'Preparar resultado demonstrativo',agent,phase:'Execução',deps:[0],status:'pending'},{title:'Rever critérios com SENTINEL',agent:'SENTINEL',phase:'Revisão',deps:[1],status:'pending'}],events:[{text:'Missão criada no workspace demonstrativo',time:new Date().toISOString()}]};}
+function status(m){if(m.tasks.some(t=>t.status==='failed'))return 'failed';if(m.tasks.some(t=>t.status==='blocked'))return 'blocked';if(m.tasks.every(t=>t.status==='done'))return 'done';if(m.tasks.some(t=>t.status!=='pending'))return 'running';return 'pending';}
+function progress(m){return Math.round(m.tasks.filter(t=>t.status==='done').length/m.tasks.length*100)}
+function transition(m,index,next){const t=m.tasks[index];if(!t)return false;const allowed={pending:['running'],running:['done','blocked','failed'],blocked:['pending'],failed:['pending'],done:[]};if(!allowed[t.status]?.includes(next))return false;if(next==='running'&&!t.deps.every(d=>m.tasks[d].status==='done'))return false;t.status=next;m.events.unshift({text:t.title+' · '+({running:'iniciada',done:'concluída',blocked:'bloqueada',failed:'falha simulada',pending:'reaberta'}[next]),time:new Date().toISOString()});return true;}
+function initial(){const a=mission('Preparar o briefing da próxima semana','ATLAS','Alta'),b=mission('Explorar a experiência mobile','FORGE'),c=mission('Criar o guia de voz NEXO','LYRA');a.tasks[0].status='done';a.tasks[1].status='running';b.tasks[0].status='blocked';c.tasks.forEach(t=>t.status='done');a.events[0].text='Cenário inicial fictício: planeamento concluído; execução iniciada.';b.events[0].text='Cenário inicial fictício: planeamento bloqueado.';c.events[0].text='Cenário inicial fictício: três tarefas concluídas e revisão aprovada.';return {version:3,missions:[a,b,c],drafts:[],auto:[true,false,true],messages:[],notes:'Identidade NEXO: dark navy, cyan e purple.\nTodos os cenários deste workspace são demonstrativos.',notifications:[{text:'Workspace Premium Experience preparado.',read:false},{text:'Missão mobile aguarda desbloqueio simulado.',read:false}],activeAgent:'NEXO'};}
+function valid(s){return s&&s.version===3&&Array.isArray(s.missions)&&new Set(s.missions.map(m=>m?.id)).size===s.missions.length&&s.missions.every(m=>typeof m.id==='string'&&typeof m.title==='string'&&agents.some(a=>a.id===m.agent)&&Array.isArray(m.events)&&m.events.every(e=>typeof e.text==='string'&&typeof e.time==='string')&&Array.isArray(m.tasks)&&m.tasks.length>0&&m.tasks.every((t,i)=>typeof t.title==='string'&&typeof t.phase==='string'&&agents.some(a=>a.id===t.agent)&&['pending','running','done','blocked','failed'].includes(t.status)&&Array.isArray(t.deps)&&t.deps.every(d=>Number.isInteger(d)&&d>=0&&d<i)&&(!['running','done'].includes(t.status)||t.deps.every(d=>m.tasks[d].status==='done'))))&&Array.isArray(s.drafts)&&s.drafts.every(d=>['to','subject','body'].every(k=>typeof d[k]==='string'))&&Array.isArray(s.messages)&&s.messages.every(m=>['user','assistant'].includes(m.role)&&typeof m.text==='string')&&Array.isArray(s.auto)&&s.auto.length===3&&s.auto.every(v=>typeof v==='boolean')&&typeof s.notes==='string'&&Array.isArray(s.notifications)&&s.notifications.every(n=>typeof n.text==='string'&&typeof n.read==='boolean')&&agents.some(a=>a.id===s.activeAgent);}
+function migrate(old){const s=initial();if(!old||typeof old!=='object')return s;if(Array.isArray(old.missions)){const ms=old.missions.filter(m=>typeof m.title==='string').map(m=>{const n=mission(m.title,agents.some(a=>a.id===m.agent)?m.agent:'ATLAS');n.events[0].text='Importada da v0.2. Subtarefas por validar; percentagem antiga não convertida em trabalho concluído.';return n});if(ms.length)s.missions=ms;}if(Array.isArray(old.drafts))s.drafts=old.drafts.filter(d=>['to','subject','body'].every(k=>typeof d[k]==='string'));if(typeof old.notes==='string')s.notes=old.notes;if(Array.isArray(old.auto)&&old.auto.length===3&&old.auto.every(v=>typeof v==='boolean'))s.auto=old.auto;if(Array.isArray(old.messages))s.messages=old.messages.filter(m=>['user','assistant'].includes(m.role)&&typeof m.text==='string');return s;}
+const api={agents,clone,mission,status,progress,transition,initial,valid,migrate};if(typeof module!=='undefined')module.exports=api;else root.NexoModel=api;
+})(globalThis);
+
+</script><script>
+(function(root){
+const VERSION='1.0';
+class ServiceError extends Error{constructor(code,message,retryable=false){super(message);this.name='ServiceError';this.code=code;this.retryable=retryable}}
+const fail=(code,message,retryable=false)=>{throw new ServiceError(code,message,retryable)};
+const definitions={
+ 'agents.list':{permission:'read',fields:{}},
+ 'services.status':{permission:'read',fields:{}},
+ 'chat.history':{permission:'read',fields:{agent:'agent'}},
+ 'chat.stream':{permission:'chat',fields:{agent:'agent',text:'text',requestId:'id'}},
+ 'missions.list':{permission:'read',fields:{}},
+ 'missions.create':{permission:'mission.write',fields:{title:'title',agent:'agent',priority:'priority',requestId:'id'}},
+ 'missions.transition':{permission:'mission.write',fields:{id:'id',taskIndex:'index',next:'taskStatus',expectedRevision:'revision',requestId:'id'}},
+ 'missions.events':{permission:'read',fields:{id:'id'}},
+ 'missions.result':{permission:'read',fields:{id:'id'}},
+ 'comms.list':{permission:'read',fields:{}},
+ 'comms.save':{permission:'draft.write',fields:{to:'email',subject:'title',body:'body',requestId:'id'},optional:{id:'id',expectedRevision:'revision'}},
+ 'comms.requestApproval':{permission:'draft.write',fields:{id:'id',expectedRevision:'revision',requestId:'id'}},
+ 'comms.approve':{permission:'draft.approve',fields:{id:'id',expectedRevision:'revision',confirmation:'confirm',requestId:'id'}},
+ 'comms.send':{permission:'send.disabled',fields:{id:'id',expectedRevision:'revision',requestId:'id'}}
+};
+const agentIds=['NEXO','ATLAS','NOVA','FORGE','SENTINEL','IMMO','LYRA'];
+const predicates={agent:v=>agentIds.includes(v),text:v=>typeof v==='string'&&v.trim().length>0&&v.length<=2000,title:v=>typeof v==='string'&&v.trim().length>0&&v.length<=150,body:v=>typeof v==='string'&&v.trim().length>0&&v.length<=5000,id:v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(v),email:v=>typeof v==='string'&&v.length<=150&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),priority:v=>['Normal','Alta','Baixa'].includes(v),index:v=>Number.isInteger(v)&&v>=0&&v<100,revision:v=>Number.isInteger(v)&&v>=0,taskStatus:v=>['pending','running','done','blocked','failed'].includes(v),confirm:v=>v===true};
+function validate(op,input,version=VERSION){if(version!==VERSION)fail('UNSUPPORTED_VERSION','Versão de contrato não suportada.');const def=Object.hasOwn(definitions,op)?definitions[op]:null;if(!def)fail('NOT_FOUND','Operação desconhecida.');if(!input||typeof input!=='object'||Array.isArray(input))fail('VALIDATION_ERROR','Pedido inválido.');for(const key of Object.keys(input)){const kind=Object.hasOwn(def.fields,key)?def.fields[key]:Object.hasOwn(def.optional||{},key)?def.optional[key]:null;if(!kind||!predicates[kind](input[key]))fail('VALIDATION_ERROR','Campo inválido: '+key+'.');}for(const key of Object.keys(def.fields))if(!(key in input))fail('VALIDATION_ERROR','Campo obrigatório: '+key+'.');return def}
+const permissions={owner:['read','chat','mission.write','draft.write','draft.approve'],operator:['read','chat','mission.write','draft.write'],reviewer:['read','draft.approve'],viewer:['read']};
+const error=e=>({code:e instanceof ServiceError?e.code:'INTERNAL_ERROR',message:e instanceof ServiceError?e.message:'Não foi possível concluir a operação demonstrativa.',retryable:e instanceof ServiceError?e.retryable:false});
+const api={VERSION,ServiceError,fail,definitions,permissions,validate,error,agentIds};if(typeof module!=='undefined')module.exports=api;else root.NexoContracts=api;
+})(globalThis);
+
+</script><script>
+(function(root){
+const C=typeof module!=='undefined'?require('./contracts.js'):root.NexoContracts;
+const M=typeof module!=='undefined'?require('../model.js'):root.NexoModel;
+const clone=v=>JSON.parse(JSON.stringify(v));
+function createMockAdapter({store,wait=ms=>new Promise(r=>setTimeout(r,ms)),latency=100,clock=()=>Date.now()}={}){
+ if(!store?.read||!store?.write)throw Error('Mock store required');
+ let sequence=0,fault=null;const receipts=new Map(),active=new Set();
+ const id=prefix=>prefix+'_'+clock().toString(36)+'_'+(++sequence);
+ const snapshot=()=>clone(store.read());const write=s=>store.write(clone(s));
+ function normalise(s){s.missions.forEach(m=>{m.revision??=0});s.drafts.forEach(d=>{d.id??=id('draft');d.revision??=0;d.approval??={status:'draft',revision:d.revision}});return s}
+ function findMission(s,key){const m=s.missions.find(m=>m.id===key);if(!m)C.fail('NOT_FOUND','Missão não encontrada.');return m}
+ function findDraft(s,key){const d=s.drafts.find(d=>d.id===key);if(!d)C.fail('NOT_FOUND','Rascunho não encontrado.');return d}
+ function revision(entity,expected){if(entity.revision!==expected)C.fail('CONFLICT','O conteúdo mudou. Atualiza e revê antes de repetir.');}
+ function contentKey(d){return JSON.stringify([d.to,d.subject,d.body,d.revision])}
+ async function gate(ctx,permission){ctx.check(permission);await wait(latency);ctx.check(permission);if(ctx.signal?.aborted)C.fail('CANCELLED','Operação cancelada.');if(fault){const current=fault;fault=null;if(current==='NETWORK_ERROR')C.fail(current,'Falha de rede simulada. Nenhuma chamada externa foi feita.',true);if(current==='TIMEOUT')C.fail(current,'Tempo de espera simulado excedido.',true);C.fail('INTERNAL_ERROR','Falha interna simulada.',true)}}
+ async function execute(op,input,ctx){const def=C.validate(op,input);await gate(ctx,def.permission);const receiptKey=input.requestId?ctx.sessionId+':'+op+':'+input.requestId:null;const fingerprint=JSON.stringify(input);if(receiptKey&&receipts.has(receiptKey)){const r=receipts.get(receiptKey);if(r.fingerprint!==fingerprint)C.fail('CONFLICT','Identificador de pedido reutilizado com conteúdo diferente.');return clone(r.data)}
+ const s=normalise(snapshot());let data,mutated=false;
+ switch(op){
+ case 'agents.list':data=M.agents.map(a=>({...a,status:'demo_available',operational:false}));break;
+ case 'services.status':data={mode:'mock',externalConnections:0,realSendEnabled:false,services:['Chat','Agentes','Missões','COMMS'].map(name=>({name,state:'demo',operational:false}))};break;
+ case 'chat.history':data=s.messages.filter(m=>(m.agent||'NEXO')===input.agent);break;
+ case 'missions.list':data=s.missions;break;
+ case 'missions.create':{const m=M.mission(input.title,input.agent,input.priority);m.revision=0;s.missions.unshift(m);data=m;mutated=true;break}
+ case 'missions.transition':{const m=findMission(s,input.id);revision(m,input.expectedRevision);if(!M.transition(m,input.taskIndex,input.next))C.fail('CONFLICT','Transição inválida ou dependência incompleta.');m.revision++;data=m;mutated=true;break}
+ case 'missions.events':{const m=findMission(s,input.id);data={missionId:m.id,revision:m.revision,events:m.events.map((e,i)=>({...e,id:m.id+'_'+(m.events.length-i),sequence:m.events.length-i,demonstrative:true}))};break}
+ case 'missions.result':{const m=findMission(s,input.id);data={missionId:m.id,revision:m.revision,status:M.status(m),available:M.status(m)==='done',demonstrative:true,review:{agent:'SENTINEL',status:m.tasks.at(-1).status},tasks:m.tasks};break}
+ case 'comms.list':data=s.drafts;break;
+ case 'comms.save':{let d;if(input.id){d=findDraft(s,input.id);if(input.expectedRevision===undefined)C.fail('VALIDATION_ERROR','Revisão obrigatória para editar.');revision(d,input.expectedRevision);d.revision++}else{if(input.expectedRevision!==undefined)C.fail('VALIDATION_ERROR','Revisão inesperada num novo rascunho.');d={id:id('draft'),revision:0};s.drafts.unshift(d)}Object.assign(d,{to:input.to,subject:input.subject,body:input.body,approval:{status:'draft',revision:d.revision}});data=d;mutated=true;break}
+ case 'comms.requestApproval':{const d=findDraft(s,input.id);revision(d,input.expectedRevision);if(d.approval.status!=='draft')C.fail('CONFLICT','Este rascunho já tem um pedido ou aprovação.');d.approval={status:'pending',revision:d.revision,contentKey:contentKey(d),requestedAt:new Date(clock()).toISOString()};data=d;mutated=true;break}
+ case 'comms.approve':{const d=findDraft(s,input.id);revision(d,input.expectedRevision);if(d.approval.status!=='pending'||d.approval.contentKey!==contentKey(d))C.fail('CONFLICT','É necessário um pedido válido para esta versão do rascunho.');d.approval={...d.approval,status:'approved',approvedBy:'demo-'+ctx.role,approvedAt:new Date(clock()).toISOString(),individualConfirmation:true};data=d;mutated=true;break}
+ case 'comms.send':C.fail('SEND_DISABLED','Envio real desativado nesta versão.');break;
+ default:C.fail('NOT_FOUND','Operação desconhecida.');
+ }
+ // Assign stable local identifiers to imported v0.5 drafts once. No credentials are persisted.
+ if(mutated||JSON.stringify(s)!==JSON.stringify(store.read()))write(s);
+ if(receiptKey){receipts.set(receiptKey,{fingerprint,data:clone(data)});if(receipts.size>100)receipts.delete(receipts.keys().next().value)}return clone(data);
+ }
+ async function* stream(input,ctx){C.validate('chat.stream',input);let seq=0,assistantId=null;const streamId=id('stream');const event=(type,data)=>({contractVersion:C.VERSION,streamId,requestId:input.requestId,sequence:++seq,type,data,demonstrative:true});
+ try{await gate(ctx,'chat');if(active.has(input.requestId))C.fail('CONFLICT','Pedido de chat já em curso.');const existing=snapshot().messages.find(m=>m.requestId===input.requestId);if(existing)C.fail('CONFLICT','Pedido já registado. Consulta o histórico antes de repetir.');active.add(input.requestId);
+ const s=snapshot();assistantId=id('message');s.messages.push({id:id('message'),agent:input.agent,role:'user',text:input.text,requestId:input.requestId,status:'complete'},{id:assistantId,agent:input.agent,role:'assistant',text:'',requestId:input.requestId,status:'streaming'});write(s);yield event('start',{messageId:assistantId,agent:input.agent});
+ yield event('tool',{name:'workspace_summary',status:'simulated',executed:false,description:'Leitura apenas do cenário local; nenhuma ferramenta externa.'});
+ const answer=/resum|estado|workspace/i.test(input.text)?`Resumo demonstrativo de ${input.agent}\n\n• ${s.missions.length} missões locais\n• ${s.missions.filter(m=>M.status(m)==='done').length} concluídas\n\nAbre Mission Control para rever tarefas e dependências. Nenhum serviço externo foi consultado.`:`Plano demonstrativo de ${input.agent}\n\n1. Define o objetivo e os critérios.\n2. Prepara um resultado fictício.\n3. Revê com SENTINEL.\n\nEsta resposta é simulada, sem modelo de IA ou execução externa.`;
+ const chunks=Array.from({length:Math.ceil(answer.length/22)},(_,i)=>answer.slice(i*22,(i+1)*22));
+ for(const chunk of chunks){await wait(140);ctx.check('chat');if(ctx.signal?.aborted)C.fail('CANCELLED','Resposta interrompida por ti.');const current=snapshot(),m=current.messages.find(m=>m.id===assistantId);if(!m)C.fail('CONFLICT','O histórico foi alterado durante a resposta.');m.text+=chunk;write(current);yield event('delta',{messageId:assistantId,text:chunk})}
+ const done=snapshot(),m=done.messages.find(m=>m.id===assistantId);m.status='complete';write(done);yield event('done',{messageId:assistantId});
+ }catch(e){const err=C.error(e);if(assistantId){const s=snapshot(),m=s.messages.find(m=>m.id===assistantId);if(m){m.status=err.code==='CANCELLED'?'cancelled':'failed';m.text=m.text||'Sem conteúdo recebido.';write(s)}}yield event(err.code==='CANCELLED'?'cancelled':'error',err)}finally{active.delete(input.requestId);if(assistantId){const s=snapshot(),m=s.messages.find(m=>m.id===assistantId);if(m?.status==='streaming'){m.status='cancelled';write(s)}}}
+ }
+ const initial=normalise(snapshot());initial.messages.forEach(m=>{if(m.status==='streaming')m.status='cancelled'});if(JSON.stringify(initial)!==JSON.stringify(store.read()))write(initial);
+ return {execute,stream,setFault(code){if(!['NETWORK_ERROR','TIMEOUT','INTERNAL_ERROR',null].includes(code))throw Error('Unsupported mock fault');fault=code},clear(){receipts.clear();fault=null}};
+}
+const api={createMockAdapter};if(typeof module!=='undefined')module.exports=api;else root.NexoMockAdapter=api;
+})(globalThis);
+
+
+</script><script>
+(function(root){
+const C=typeof module!=='undefined'?require('./contracts.js'):root.NexoContracts;
+const Model=typeof module!=='undefined'?require('../model.js'):root.NexoModel;
+const Mock=typeof module!=='undefined'?require('./mock-adapter.js'):root.NexoMockAdapter;
+function createClient(options={}){const now=options.clock||(()=>Date.now());let serial=0,generation=0;let session={state:'authenticated',role:'owner',expiresAt:now()+3600000,id:'demo-session-0',mode:'mock'};const listeners=new Set();
+ const emit=()=>listeners.forEach(fn=>fn({...session}));
+ function current(){if(options.adapter?.remote)return options.adapter.auth.current();if(session.state==='authenticated'&&now()>=session.expiresAt){session={...session,state:'expired'};generation++;emit()}return {...session}}
+ function context(signal){const captured=generation,sessionId=session.id,role=session.role;return {signal,sessionId,role,check(permission){const s=current();if(permission==='send.disabled')C.fail('SEND_DISABLED','Envio real desativado, mesmo com aprovação.');if(s.state==='expired')C.fail('SESSION_EXPIRED','A sessão demonstrativa expirou. Renova-a em Settings.');if(s.state!=='authenticated')C.fail('UNAUTHENTICATED','Inicia uma sessão demonstrativa em Settings.');if(captured!==generation)C.fail('SESSION_CHANGED','A sessão mudou durante a operação.');if(!C.permissions[s.role]?.includes(permission))C.fail('FORBIDDEN','O perfil demonstrativo atual não tem esta permissão.')}}}
+ const clone=v=>JSON.parse(JSON.stringify(v));let backendState=options.store?clone(options.store.read()):null;
+ const adapter=options.adapter||Mock.createMockAdapter({...options,store:{read:()=>backendState,write:s=>{backendState=clone(s)}}});
+ if(!options.adapter)options.store.write(clone(backendState));
+ function project(op,input,data){if(!options.store)return;const s=clone(options.store.read());if(op==='missions.list')s.missions=data;else if(op==='comms.list')s.drafts=data;else if(op==='chat.history')s.messages=[...s.messages.filter(m=>(m.agent||'NEXO')!==input.agent),...data];else if(['missions.create','missions.transition'].includes(op)){const i=s.missions.findIndex(m=>m.id===data.id);if(i<0)s.missions.unshift(data);else s.missions[i]=data;}else if(['comms.save','comms.requestApproval','comms.approve'].includes(op)){const i=s.drafts.findIndex(d=>d.id===data.id);if(i<0)s.drafts.unshift(data);else s.drafts[i]=data;}else if(op==='missions.events'){const m=s.missions.find(m=>m.id===data.missionId);if(m)m.events=data.events;}else return;if(!Model.valid(s))C.fail('INVALID_RESPONSE','Dados incompatíveis com o workspace.');options.store.write(clone(s));}
+ function projectEvent(input,event){if(!options.store)return;const s=clone(options.store.read());let m=s.messages.find(m=>m.requestId===input.requestId&&m.role==='assistant');if(event.type==='start'&&!m){s.messages.push({id:event.streamId+'_user',agent:input.agent,role:'user',text:input.text,requestId:input.requestId,status:'complete'});m={id:event.data.messageId,agent:input.agent,role:'assistant',text:'',requestId:input.requestId,status:'streaming'};s.messages.push(m);}if(m){if(event.type==='delta')m.text+=event.data.text;if(event.type==='done')m.status='complete';if(['error','cancelled'].includes(event.type)){m.status=event.type==='cancelled'?'cancelled':'failed';m.text=m.text||'Sem conteúdo recebido.';}}options.store.write(s);}
+
+ function validateOutput(op,data){const arrayOps=['agents.list','chat.history','missions.list','comms.list'];if(arrayOps.includes(op)){if(!Array.isArray(data))C.fail('INVALID_RESPONSE','Resposta incompatível com o contrato.');if(op==='agents.list'&&data.some(a=>!C.agentIds.includes(a.id)||a.operational!==false||typeof a.role!=='string'||!/^#[0-9a-f]{6}$/i.test(a.color)||!Array.isArray(a.skills)||a.skills.some(x=>typeof x!=='string')))C.fail('INVALID_RESPONSE','Catálogo demonstrativo inválido.');if(op==='missions.list'&&data.some(m=>!m.id||!Array.isArray(m.tasks)))C.fail('INVALID_RESPONSE','Lista de missões inválida.');if(op==='comms.list'&&data.some(d=>typeof d.id!=='string'||typeof d.revision!=='number'))C.fail('INVALID_RESPONSE','Lista de rascunhos inválida.')}else if(!data||typeof data!=='object')C.fail('INVALID_RESPONSE','Resposta incompatível com o contrato.');if(['missions.create','missions.transition'].includes(op)&&(!data.id||!Array.isArray(data.tasks)||!Number.isInteger(data.revision)))C.fail('INVALID_RESPONSE','Missão inválida.');if(op.startsWith('comms.')&&op!=='comms.list'&&op!=='comms.send'&&(!data.id||!Number.isInteger(data.revision)||!data.approval||typeof data.body!=='string'))C.fail('INVALID_RESPONSE','Rascunho inválido.');if(op==='services.status'&&(!Array.isArray(data.services)||data.realSendEnabled!==false||data.externalConnections!==0))C.fail('INVALID_RESPONSE','Estado demonstrativo inválido.');if(['missions.create','missions.transition'].includes(op)&&(!data.id||!Array.isArray(data.tasks)||!Number.isInteger(data.revision)))C.fail('INVALID_RESPONSE','Missão inválida.');if(op.startsWith('comms.')&&op!=='comms.list'&&op!=='comms.send'&&(!data.id||!Number.isInteger(data.revision)||!data.approval||typeof data.body!=='string'))C.fail('INVALID_RESPONSE','Rascunho inválido.');if(op==='services.status'&&(!Array.isArray(data.services)||data.realSendEnabled!==false||data.externalConnections!==0))C.fail('INVALID_RESPONSE','Estado demonstrativo inválido.');return data}
+ async function request(operation,input={},requestOptions={}){const requestId='rpc_'+(++serial);try{const def=C.validate(operation,input,requestOptions.contractVersion||C.VERSION),ctx=context(requestOptions.signal);ctx.check(def.permission);const data=validateOutput(operation,await adapter.execute(operation,input,ctx));ctx.check(def.permission);if(ctx.signal?.aborted)C.fail('CANCELLED','Operação cancelada.');project(operation,input,data);return {contractVersion:C.VERSION,ok:true,requestId,data,demonstrative:true}}catch(e){return {contractVersion:C.VERSION,ok:false,requestId,error:C.error(e),demonstrative:true}}}
+ const api={contractVersion:C.VERSION,mode:'mock',request,newRequestId:()=> 'ui_'+now().toString(36)+'_'+(++serial),snapshot:()=>JSON.parse(JSON.stringify(options.store.read())),auth:{current,signIn(role='owner'){if(!C.permissions[role])C.fail('VALIDATION_ERROR','Perfil demonstrativo desconhecido.');generation++;session={state:'authenticated',role,expiresAt:now()+3600000,id:'demo-session-'+generation,mode:'mock'};emit();return current()},signOut(){generation++;session={state:'signed_out',role:null,expiresAt:null,id:'demo-session-'+generation,mode:'mock'};emit();return current()},expire(){generation++;session={...session,state:'expired',expiresAt:now()};emit();return current()},subscribe(fn){listeners.add(fn);return ()=>listeners.delete(fn)}},simulation:{failNext:code=>adapter.setFault(code),clear:()=>{adapter.clear();if(!options.adapter){backendState=clone(options.store.read());backendState.missions.forEach(m=>m.revision??=0);backendState.drafts.forEach((d,i)=>{d.id??="import_"+now()+"_"+i;d.revision??=0;d.approval??={status:"draft",revision:d.revision}});options.store.write(clone(backendState))}}},agents:{list:()=>request('agents.list')},services:{status:()=>request('services.status')},chat:{history:agent=>request('chat.history',{agent}),async *stream(input,{signal,contractVersion=C.VERSION}={}){let sequence=0,streamId=null;const ctx=context(signal);try{C.validate('chat.stream',input,contractVersion);ctx.check('chat');for await(const event of adapter.stream(input,ctx)){ctx.check('chat');if(signal?.aborted&&event.type!=='cancelled')C.fail('CANCELLED','Resposta interrompida por ti.');if((event.type==='start'&&(typeof event.data?.messageId!=='string'||!C.agentIds.includes(event.data?.agent)))||(event.type==='tool'&&(event.data?.executed!==false||event.data?.status!=='simulated'))||event.contractVersion!==C.VERSION||!Number.isInteger(event.sequence)||event.sequence!==sequence+1||!['start','tool','delta','done','cancelled','error'].includes(event.type)||typeof event.streamId!=='string'||event.requestId!==input.requestId||!event.data||typeof event.data!=='object'||(streamId&&event.streamId!==streamId)||(event.type==='delta'&&typeof event.data.text!=='string'))C.fail('INVALID_RESPONSE','Evento de streaming inválido.');sequence=event.sequence;streamId=event.streamId;projectEvent(input,event);yield event}}catch(e){const rejected={contractVersion:C.VERSION,streamId:streamId||'rejected',requestId:input.requestId||'invalid',sequence:sequence+1,type:e.code==='CANCELLED'?'cancelled':'error',data:C.error(e),demonstrative:true};projectEvent(input,rejected);yield rejected}finally{if(options.store){const s=clone(options.store.read()),m=s.messages.find(m=>m.requestId===input.requestId&&m.role==='assistant');if(m?.status==='streaming'){m.status='cancelled';options.store.write(s)}}}}},missions:{list:()=>request('missions.list'),create:input=>request('missions.create',input),transition:input=>request('missions.transition',input),events:id=>request('missions.events',{id}),result:id=>request('missions.result',{id})},comms:{list:()=>request('comms.list'),save:input=>request('comms.save',input),requestApproval:input=>request('comms.requestApproval',input),approve:input=>request('comms.approve',input),send:input=>request('comms.send',input)}};
+ if(options.adapter?.remote){api.auth=options.adapter.auth;api.mode='http-local';}
+ return api;
+}
+const api={createClient};if(typeof module!=='undefined')module.exports=api;else root.NexoServices=api;
+})(globalThis);
+
+</script><script>
+/* UI binding only: all core mutations use the versioned service client. */
+(function(){let count=0,controller=null,retryText='',lastError='',toolNotice='',subscribed=false,readStatus=null;const busyElements=new WeakSet();
+function notice(){const el=document.querySelector('#session-notice');if(!el||!services)return;const s=services.auth.current();el.hidden=s.state==='authenticated'&&!lastError;el.textContent=lastError||(s.state==='expired'?'Sessão demo expirada. Renova em Settings.':s.state==='signed_out'?'Sessão demo terminada. O conteúdo visível é uma cópia fictícia local.':'');}
+async function command(op,input,target){if(target&&busyElements.has(target))return null;count++;if(target)busyElements.add(target);const controls=target?.matches?.('button')?[target]:[...(target?.querySelectorAll?.('button,input,textarea,select')||[])];const disabled=controls.map(el=>el.disabled);controls.forEach(el=>el.disabled=true);try{const r=await services.request(op,input);if(!r.ok){lastError=r.error.code+' · '+r.error.message;notice();toast(r.error.message);return null}lastError='';notice();toast('Operação demonstrativa concluída.');return r.data}finally{count--;controls.forEach((el,i)=>el.disabled=disabled[i]);if(target)busyElements.delete(target)}}
+function safeRefreshChat(){if(currentPage()!=='NEXO Chat')return;const focused=document.activeElement?.id==='prompt';render();if(focused)document.querySelector('#prompt')?.focus();const log=document.querySelector('.chat');if(log)log.scrollTop=log.scrollHeight;}
+async function sendChat(text,retry=false){if(busy)return;retryText=text;chatError='';lastError='';toolNotice='';busy=true;chatDraft='';controller=new AbortController();if(failNext){services.simulation.failNext('NETWORK_ERROR');failNext=false}safeRefreshChat();const input={agent:state.activeAgent,text,requestId:services.newRequestId()};try{for await(const event of services.chat.stream(input,{signal:controller.signal})){if(event.type==='tool')toolNotice='Ferramenta simulada: '+event.data.name+' · nenhuma execução externa';if(event.type==='start')safeRefreshChat();if(event.type==='delta'&&currentPage()==='NEXO Chat'){const message=[...document.querySelectorAll('.message.assistant .message-body')].at(-1);const m=state.messages.find(m=>m.id===event.data.messageId);if(message&&m){message.textContent=m.text;document.querySelector('.chat').scrollTop=document.querySelector('.chat').scrollHeight}}if(event.type==='error'){chatError=event.data.message;lastError=event.data.code+' · '+event.data.message}if(event.type==='cancelled')toast('Resposta cancelada. O conteúdo parcial fica no histórico.')}}catch{chatError='Não foi possível concluir a resposta demonstrativa.'}finally{busy=false;controller=null;safeRefreshChat();notice()}}
+function settingsPanel(){const s=services.auth.current();return `<section class="panel foundation-panel"><div class="section-head"><h2>Integration Foundation</h2><span class="tag">CONTRATOS 1.0 · MOCK</span></div><p class="subtle">Sessões e permissões simuladas. Não existe autenticação real, token, endpoint remoto ou envio de mensagens.</p><div class="foundation-grid"><div><label>Perfil demonstrativo<select id="demo-role">${['owner','operator','reviewer','viewer'].map(r=>`<option ${r===s.role?'selected':''}>${r}</option>`).join('')}</select></label><p class="subtle" id="demo-session-state">Estado: ${esc(s.state)} · ${esc(s.role||'sem perfil')}</p><div class="actions"><button id="demo-signin">Iniciar / renovar sessão demo</button><button id="demo-expire">Simular expiração</button><button id="demo-signout">Terminar sessão demo</button></div></div><div><label>Falha na próxima operação<select id="demo-fault"><option value="NETWORK_ERROR">Rede indisponível (simulada)</option><option value="TIMEOUT">Timeout (simulado)</option><option value="INTERNAL_ERROR">Erro interno (simulado)</option></select></label><div class="actions"><button id="arm-fault">Preparar falha</button><button id="refresh-services">Consultar serviços demo</button></div><p class="subtle" id="service-result">${readStatus||'Estado operacional real: não consultado. Ligações externas: zero.'}</p></div></div><p class="subtle">owner: editar e aprovar; operator: editar; reviewer: aprovar; viewer: consultar. Nenhum perfil pode enviar emails.</p></section>`}
+async function refreshDomain(page,button){if(busy||count){toast('Aguarda a operação em curso.');return}const op={'Dashboard':'missions.list','Agentes':'agents.list','NEXO Chat':'chat.history','Mission Control':'missions.list','COMMS':'comms.list'}[page];const activeAgent=state.activeAgent;const data=await command(op,op==='chat.history'?{agent:activeAgent}:{},button);if(!data)return;if(op==='agents.list')agents=data;if(op==='missions.list')state.missions=data;if(op==='comms.list')state.drafts=data;if(op==='chat.history')state.messages=[...state.messages.filter(m=>(m.agent||'NEXO')!==activeAgent),...data];save();if(currentPage()===page)render();}
+function decorate(page){if(!subscribed){services.auth.subscribe(()=>notice());subscribed=true}notice();if(['Dashboard','Agentes','NEXO Chat','Mission Control','COMMS'].includes(page))document.querySelector('#view').insertAdjacentHTML('beforeend','<div class="service-refresh"><span class="subtle">Cópia demonstrativa local · Contratos 1.0</span><button id="refresh-domain" type="button">Atualizar dados demo</button></div>');if(page==='Settings')document.querySelector('#view').insertAdjacentHTML('beforeend',settingsPanel());if(page==='NEXO Chat'){document.querySelector('.chat-panel>.section-head').insertAdjacentHTML('beforeend','<button id="refresh-history" type="button" aria-label="Atualizar histórico demonstrativo">↻</button>');if(busy)document.querySelector('#chat .row').insertAdjacentHTML('beforeend','<button type="button" id="cancel-stream">Parar resposta</button>');if(toolNotice)document.querySelector('.chat-panel').insertAdjacentHTML('beforeend',`<div class="tool-status">${esc(toolNotice)}</div>`);}}
+async function approval(id,button){const listed=await command('comms.list',{},button);if(!listed)return;const d=listed.find(d=>d.id===id);if(!d){toast('Atualiza a lista de rascunhos.');return}if(d.approval.status==='draft'){const r=await command('comms.requestApproval',{id:d.id,expectedRevision:d.revision,requestId:services.newRequestId()},button);if(r&&currentPage()==='COMMS'&&button.isConnected)render();return}if(d.approval.status!=='pending')return;modal('Aprovar este rascunho demo?',`<span class="tag">VERSÃO ${d.revision} · NUNCA ENVIA</span><h3>${esc(d.subject)}</h3><p class="subtle">Destinatário fictício: ${esc(d.to)}</p><div class="approval-preview">${esc(d.body)}</div><p>Esta confirmação aplica-se apenas ao conteúdo e à versão apresentados. Editar o rascunho invalida a aprovação.</p><label class="approval-check"><input type="checkbox" id="individual-approval"> Confirmo individualmente este rascunho demonstrativo.</label><button id="approve-draft" class="primary" disabled>Aprovar apenas na demo</button>`);document.querySelector('#individual-approval').onchange=e=>document.querySelector('#approve-draft').disabled=!e.target.checked;document.querySelector('#approve-draft').onclick=async e=>{const r=await command('comms.approve',{id:d.id,expectedRevision:d.revision,confirmation:document.querySelector('#individual-approval').checked,requestId:services.newRequestId()},e.target);if(r){document.querySelector('#modal').close();render()}};}
+function afterBind(page){const refresh=document.querySelector('#refresh-domain');if(refresh)refresh.onclick=()=>refreshDomain(page,refresh);if(page==='Settings'){document.querySelector('#demo-signin').onclick=()=>{services.auth.signIn(document.querySelector('#demo-role').value);lastError='';render()};document.querySelector('#demo-expire').onclick=()=>{services.auth.expire();render()};document.querySelector('#demo-signout').onclick=()=>{services.auth.signOut();render()};document.querySelector('#arm-fault').onclick=()=>{services.simulation.failNext(document.querySelector('#demo-fault').value);toast('A próxima operação irá falhar apenas na simulação.')};document.querySelector('#refresh-services').onclick=async e=>{const r=await command('services.status',{},e.target);if(r){readStatus=r.services.map(s=>s.name+': '+s.state).join(' · ')+' · envio real desativado';if(document.querySelector('#service-result'))document.querySelector('#service-result').textContent=readStatus}};}
+ if(page==='COMMS')document.querySelectorAll('[data-approval]').forEach(b=>b.onclick=()=>approval(b.dataset.approval,b));
+ if(page==='NEXO Chat'){document.querySelector('#refresh-history').onclick=e=>refreshDomain(page,e.target);if(document.querySelector('#cancel-stream'))document.querySelector('#cancel-stream').onclick=()=>controller?.abort();if(document.querySelector('#retry-chat'))document.querySelector('#retry-chat').onclick=()=>sendChat(retryText,true);}
+ if(page==='Mission Control'&&document.querySelector('[data-result]'))document.querySelector('[data-result]').onclick=async e=>{const r=await command('missions.result',{id:selectedMission},e.target);if(r?.available)download('NEXO-resultado-demo.txt',JSON.stringify(r,null,2),'text/plain')};
+}
+window.NexoFoundation={clearError:()=>{lastError='';notice()},command,sendChat,decorate,afterBind,pending:()=>count>0};
+})();
+
+</script><script>
+if(String(location.pathname||'').startsWith('/bridge/')&&(!globalThis.NexoBridgeMode||!globalThis.NexoBridgeAdapter))throw Error('Bridge indisponível: fallback mock bloqueado.');
+/* v0.3 evolves the v0.2 routes, forms and local persistence. */
+const M=NexoModel;let agents=M.agents;const pages=['Dashboard','NEXO Chat','Agentes','Mission Control','COMMS','Memory','Automations','Settings'];
+const icons=['◈','⌘','◎','↗','✉','▦','ϟ','⚙'],labels={pending:'Pendente',running:'Em execução',done:'Concluído',blocked:'Bloqueado',failed:'Falhado'};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let state,storageIssue='',selectedMission=null,filter='all',busy=false,chatError='',failNext=false,chatDraft='',toastTimer,installPrompt;
+try{const raw=(globalThis.NexoStorage||localStorage).getItem('nexo-demo-v4');if(raw){state=JSON.parse(raw);if(!M.valid(state))throw Error('invalid')}else{const prior=(globalThis.NexoStorage||localStorage).getItem('nexo-demo-v3');const old=(globalThis.NexoStorage||localStorage).getItem('nexo-demo-v2');if(prior){state=JSON.parse(prior);if(!M.valid(state))throw Error('invalid prior')}else state=old?M.migrate(JSON.parse(old)):M.initial();(globalThis.NexoStorage||localStorage).setItem('nexo-demo-v4',JSON.stringify(state));}}catch(e){state=M.initial();storageIssue='Não foi possível recuperar os dados locais. Foi aberta uma sessão demonstrativa temporária. Exporta os dados antes de fechar.';}
+const services=globalThis.NexoServices?globalThis.NexoServices.createClient({adapter:globalThis.NexoBridgeAdapter,store:{read:()=>state,write:next=>{state=next;save()}},latency:120}):null;
+function save(){if(storageIssue)return false;try{(globalThis.NexoStorage||localStorage).setItem('nexo-demo-v4',JSON.stringify(state));return true}catch{storageIssue='Não foi possível guardar neste navegador. As alterações mantêm-se apenas nesta sessão; podes exportá-las em Settings.';showStorage();return false}}
+function showStorage(){const el=$('#storage-warning');el.hidden=!storageIssue;el.textContent=storageIssue}
+function toast(t){clearTimeout(toastTimer);$('#toast').textContent=t;$('#toast').style.display='block';toastTimer=setTimeout(()=>$('#toast').style.display='none',3500)}
+function feedback(){toast(save()?'Guardado apenas neste navegador.':'Alteração mantida apenas nesta sessão.')}
+function notify(text){state.notifications.unshift({text,read:false});state.notifications=state.notifications.slice(0,40)}
+function agent(id){return agents.find(a=>a.id===id)||agents[0]}
+function avatar(id){const a=agent(id);return `<div class="avatar" style="--agent:${a.color}" aria-hidden="true"><img src="${window.NexoAvatarData[a.id.toLowerCase()]}" width="128" height="128" alt="" decoding="async"></div>`}
+function badge(s){return `<span class="tag status-${s}">${labels[s]}</span>`}
+const link=(p,t,cls='')=>`<a class="button ${cls}" href="#${p}">${t}</a>`;
+function time(t){const d=new Date(t);return Number.isNaN(d.getTime())?'Cenário demonstrativo':d.toLocaleString('pt-PT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
+function events(){return state.missions.flatMap(m=>m.events.map(e=>({...e,mission:m.title}))).sort((a,b)=>new Date(b.time)-new Date(a.time)).slice(0,5)}
+function eventHTML(e){return `<div class="event"><span class="event-dot"></span><div><p>${esc(e.text)}</p><time>${esc(time(e.time))}</time></div></div>`}
+function missionSummary(m){return `<button class="mission-link" data-mission="${esc(m.id)}"><div class="row"><h3>${esc(m.title)}</h3><span aria-hidden="true">↗</span></div><div class="mission-meta"><span>${esc(m.agent)}</span><span class="priority">${esc(m.priority||'Normal')}</span>${badge(M.status(m))}</div><div class="progress-row"><progress aria-label="Progresso de ${esc(m.title)}" value="${M.progress(m)}" max="100"></progress><span>${M.progress(m)}%</span></div></button>`}
+function modal(title,content){const d=$('#modal');d.innerHTML=`<div class="section-head"><h2 id="modal-title">${esc(title)}</h2><button id="close-modal" aria-label="Fechar janela">×</button></div>${content}`;d.showModal();$('#close-modal').onclick=()=>d.close()}
+function newMission(prefill='ATLAS'){modal('Nova missão demonstrativa',`<p>Um objetivo, três fases e revisão simulada. Nenhuma tarefa é executada fora desta demo.</p><form id="mission-form"><label>Objetivo<input name="title" required maxlength="120" placeholder="Ex.: Preparar um plano de comunicação"></label><label>Agente responsável<select name="agent">${agents.map(a=>`<option ${a.id===prefill?'selected':''}>${a.id}</option>`).join('')}</select></label><label>Prioridade<select name="priority"><option>Normal</option><option>Alta</option><option>Baixa</option></select></label><button class="primary">Criar missão</button></form>`);$('#mission-form').onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));if(!d.title.trim())return;if(services){const r=await window.NexoFoundation.command('missions.create',{title:d.title.trim(),agent:d.agent,priority:d.priority,requestId:services.newRequestId()},e.target);if(!r)return;selectedMission=r.id;filter='all';notify('Nova missão demonstrativa: '+r.title);save();$('#modal').close();if(currentPage()==='Mission Control')render();else location.hash='Mission Control';return}const m=M.mission(d.title.trim(),d.agent,d.priority);state.missions.unshift(m);selectedMission=m.id;filter='all';notify('Nova missão: '+m.title);feedback();$('#modal').close();if(currentPage()==='Mission Control')render();else location.hash='Mission Control'}}
+function dashboard(){return `<section class="hero"><div class="hero-copy"><span class="eyebrow"><i></i> NEXO HUB / PREVIEW v0.7.3</span><h2 class="hero-title">A tua visão.<br>Uma equipa de possibilidades.</h2><div class="hero-label">HUMAN VISION. AGENT INTELLIGENCE.</div><p>Um centro de comando para pensar, planear e criar.<br>Explora o próximo passo com a tua equipa de agentes.</p><div class="actions">${link('NEXO Chat','✦ &nbsp; Falar com NEXO','primary')}<button data-new>＋ Criar missão</button></div></div><div class="mobile-core"><div class="mobile-core-main">${avatar('NEXO')}<div><span class="eyebrow">NEXO CORE</span><strong>Uma equipa. A tua visão.</strong><small>7 identidades · demonstração</small></div></div><div class="mobile-core-team">${agents.filter(a=>a.id!=='NEXO').map(a=>`<span title="${a.id}">${avatar(a.id)}<small>${a.id}</small></span>`).join('')}</div></div><div class="command-orbit" aria-hidden="true"><div class="orbit-grid"></div><div class="orbit-ring ring-one"></div><div class="orbit-ring ring-two"></div><div class="orbit-core">${avatar('NEXO')}<span>NEXO CORE</span><small>DEMONSTRATION ENGINE</small></div>${['ATLAS','NOVA','FORGE','SENTINEL','IMMO','LYRA'].map((id,i)=>`<div class="orbit-node node-${i}">${avatar(id)}<span>${id}</span></div>`).join('')}<div class="orbit-caption"><i></i> 07 AGENTES / 01 WORKSPACE</div></div></section><div class="grid stats">${[['Equipa de agentes','07','Identidades demonstrativas','◎'],['Missões em curso',state.missions.filter(m=>M.status(m)==='running').length,'Progresso por subtarefas','↗'],['Tarefas concluídas',state.missions.reduce((n,m)=>n+m.tasks.filter(t=>t.status==='done').length,0),'Neste workspace local','✓'],['Atenção necessária',state.missions.filter(m=>['blocked','failed'].includes(M.status(m))).length,'Bloqueios e falhas simuladas','◇']].map((s,i)=>`<div class="panel stat"><div class="metric-top"><span>${s[0]}</span><em>${s[3]}</em></div><div class="row"><strong>${s[1]}</strong><div class="spark" aria-hidden="true">${[8,14,11,19,16,22,18].map((v,j)=>`<b style="height:${v-i*2+j%2}px"></b>`).join('')}</div></div><span>${s[2]}</span></div>`).join('')}</div><div class="section-title"><h2>Agent Headquarters <span class="subtle">/ A tua equipa</span></h2><a href="#Agentes">Explorar agentes ↗</a></div><div class="agent-strip">${agents.map(a=>`<button class="agent-tile" data-agent-detail="${a.id}" style="--agent:${a.color}">${avatar(a.id)}<strong>${a.id}</strong><small>Disponível · demo</small><span class="agent-line"></span></button>`).join('')}</div><div class="two"><section class="panel"><div class="section-head"><h2>Missões em foco</h2>${link('Mission Control','Ver todas ↗')}</div>${state.missions.slice(0,3).map(m=>`<div class="item">${missionSummary(m)}</div>`).join('')||'<div class="empty">Cria a tua primeira missão.</div>'}</section><section class="panel"><div class="section-head"><h2>Atividade do workspace</h2><span class="tag">DEMO</span></div>${events().map(eventHTML).join('')}<p class="subtle" style="margin:16px 0 0">Atividade local, sem telemetria de produção.</p></section></div>`}
+function agentCards(){return `<div class="grid">${agents.map((a,i)=>`<section class="panel agent-card" style="--agent:${a.color}"><div class="row">${avatar(a.id)}<span class="tag">Disponível · demo</span></div><h2>${a.id}</h2><p>${esc(a.role)}</p><small class="capability-label">CAPACIDADES DEMONSTRATIVAS</small><div class="chips">${a.skills.map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div><div class="history">Último cenário fictício<br><b>${['Briefing do workspace','Plano de prioridades','Comparação de ideias','Revisão de um protótipo','Checklist de consistência','Comparação de alojamentos fictícios','Guia de voz da marca'][i]}</b></div><div class="actions"><button data-chat-agent="${a.id}">Conversar ↗</button><button data-new="${a.id}" aria-label="Criar missão para ${a.id}">＋ Missão</button></div></section>`).join('')}</div><p class="subtle">Papéis e capacidades ilustram esta interface. Não representam ferramentas ou acesso operacional à infraestrutura.</p>`}
+function missionPage(){let ms=state.missions.filter(m=>filter==='all'||M.status(m)===filter);let m=ms.find(m=>m.id===selectedMission)||ms[0];if(m)selectedMission=m.id;return `<div class="tabs" aria-label="Filtrar missões">${[['all','Todas'],...Object.entries(labels)].map(([k,v])=>`<button data-filter="${k}" aria-pressed="${filter===k}">${v}</button>`).join('')}</div><div class="mobile-mission-picker"><label for="mission-picker">Missão em foco</label><select id="mission-picker">${ms.length?ms.map(n=>`<option value="${esc(n.id)}" ${n.id===m?.id?'selected':''}>${esc(n.title)} · ${labels[M.status(n)]}</option>`).join(''):'<option>Nenhuma missão neste filtro</option>'}</select></div><div class="mission-layout"><div class="mission-list">${ms.map(n=>`<div class="${n.id===m?.id?'selected-wrapper':''}">${missionSummary(n)}</div>`).join('')||'<div class="panel empty">Não há missões neste estado.</div>'}</div>${m?`<section class="panel mission-detail"><div class="section-head"><span class="eyebrow">MISSION / ${esc(m.agent)}</span>${badge(M.status(m))}</div><h2>${esc(m.title)}</h2><div class="progress-row"><progress aria-label="Progresso global da missão" value="${M.progress(m)}" max="100"></progress><b>${M.progress(m)}%</b></div><div class="phase-track" aria-label="Fases da missão">${m.tasks.map((t,i)=>`<div class="phase phase-${t.status}"><span>${t.status==='done'?'✓':String(i+1).padStart(2,'0')}</span><b>${esc(t.phase)}</b><small>${labels[t.status]}</small></div>`).join('')}</div><p class="subtle">${m.tasks.filter(t=>t.status==='done').length} de ${m.tasks.length} tarefas concluídas · Prioridade ${esc(m.priority||'Normal')}</p>${m.tasks.map((t,i)=>{const ready=t.deps.every(d=>m.tasks[d].status==='done');return `<div class="task task-${t.status}"><div class="row"><span class="number">${t.status==='done'?'✓':i+1}</span><div><span class="eyebrow">${esc(t.phase)}</span><h3>${esc(t.title)}</h3></div>${badge(t.status)}</div><p>Responsável: ${esc(t.agent)} · ${t.deps.length?'Depende da tarefa '+t.deps.map(d=>(d+1)+' — '+(m.tasks[d].status==='done'?'concluída':'por concluir')).join(', '):'Sem dependências'}</p><div class="actions">${t.status==='pending'?`<button class="primary" data-task="${i}" data-next="running" ${ready?'':'disabled'}>${ready?'Iniciar simulação':'Aguarda dependência'}</button>`:t.status==='running'?`<button class="primary" data-task="${i}" data-next="done">${t.agent==='SENTINEL'?'Aprovar revisão simulada':'Concluir tarefa demo'}</button><button data-task="${i}" data-next="blocked">Bloquear</button><button data-task="${i}" data-next="failed">Simular falha</button>`:['blocked','failed'].includes(t.status)?`<button data-task="${i}" data-next="pending">${t.status==='blocked'?'Desbloquear':'Tentar novamente'}</button>`:'<span class="subtle">Resultado demonstrativo registado ✓</span>'}</div></div>`}).join('')}${M.status(m)==='done'?`<div class="result"><h3>✓ Resultado demonstrativo disponível</h3><p>Objetivo: ${esc(m.title)}. As três fases foram marcadas como concluídas nesta simulação. Revisão SENTINEL: checklist de objetivo, resultado e dependências aprovado manualmente na demo.</p><button data-result style="margin-top:12px">Descarregar resumo</button></div>`:''}<h3 style="margin-top:25px">Timeline de execução</h3>${m.events.slice(0,8).map(eventHTML).join('')}</section>`:'<section class="panel empty"><h2>Espaço para o próximo objetivo</h2><p>Cria uma missão ou escolhe outro filtro.</p><button data-new class="primary">＋ Nova missão</button></section>'}</div>`}
+function chatPage(){const a=agent(state.activeAgent),messages=state.messages.filter(m=>(m.agent||'NEXO')===a.id);return `<div class="chat-layout"><section class="panel chat-agents"><h2>Conversas</h2>${agents.map(a=>`<button data-chat-agent="${a.id}" aria-pressed="${state.activeAgent===a.id}">${avatar(a.id)}<span>${a.id}</span></button>`).join('')}</section><section class="panel chat-panel"><div class="section-head"><div class="row">${avatar(a.id)}<div><b>${a.id}</b><div class="subtle">${esc(a.role)}</div></div></div><div class="voice-chat-action"><span class="tag">SIMULAÇÃO</span><button type="button" data-voice-open class="voice-chat-button">🎙 Chamada de voz</button></div></div><div class="chat" role="log" aria-label="Histórico da conversa" aria-live="polite">${messages.length?messages.map(m=>`<div class="message ${m.role}">${m.role==='assistant'?avatar(m.agent||'NEXO'):''}<small>${m.role==='user'?'TU':esc(m.agent||'NEXO')} · DEMO</small><span class="message-body">${esc(m.text)}</span>${m.status&&m.status!=='complete'?`<span class="subtle message-state">${m.status==='streaming'?'A receber…':m.status==='cancelled'?'Resposta cancelada · parcial':'Resposta interrompida'}</span>`:''}</div>`).join(''):`<div class="chat-empty">${avatar(a.id)}<h2>O que vamos explorar?</h2><p>Experimenta conversar com ${a.id}. As respostas são cenários locais predefinidos, sem ligação a um modelo de IA.</p><div class="actions" style="justify-content:center"><button data-prompt="Resume o workspace">Resumo do workspace</button><button data-prompt="Ajuda-me a planear uma missão">Planear uma missão</button></div></div>`}${busy?`<div class="typing" role="status">${esc(a.id)} está a preparar uma resposta simulada ···</div>`:''}</div>${chatError?`<div class="error" role="alert">${esc(chatError)} <button id="retry-chat">Tentar novamente</button></div>`:''}<form id="chat" class="composer"><label for="prompt" class="subtle">Mensagem para ${a.id}</label><textarea id="prompt" name="text" rows="2" enterkeyhint="send" maxlength="2000" required placeholder="Escreve a tua ideia…" >${esc(chatDraft)}</textarea><div class="row"><span class="muted">Respostas fictícias · Sem ações externas</span><button class="primary" ${busy?'disabled':''}>Enviar ↗</button></div></form><div class="row" style="margin-top:10px"><span class="subtle">${messages.length} mensagens nesta conversa</span><button id="simulate-chat-error" class="subtle" ${busy?'disabled':''}>${failNext?'Falha preparada para a próxima mensagem':'Testar erro simulado'}</button></div></section></div>`}
+function comms(){return `<div class="two"><form id="draft" class="panel"><div class="section-head"><h2>Estúdio de mensagens</h2><span class="tag">SEM ENVIO</span></div><p class="subtle">Escreve, revê e guarda um rascunho fictício.</p><label>Destinatário demonstrativo<input name="to" type="email" required maxlength="150" placeholder="equipa@example.com"></label><label>Assunto<input name="subject" required maxlength="150" placeholder="Um novo capítulo começa aqui"></label><label>Mensagem<textarea name="body" required maxlength="5000" placeholder="Olá, equipa…"></textarea></label><button class="primary">Guardar rascunho local</button></form><section class="panel"><h2>Rascunhos <span class="subtle">/ ${state.drafts.length}</span></h2>${state.drafts.length?state.drafts.map((d,i)=>`<div class="item"><span class="tag">NÃO ENVIADO</span><h3>${esc(d.subject)}</h3><span class="subtle">${esc(d.to)}</span><p class="note-preview">${esc(d.body)}</p><div class="actions"><button data-edit-draft="${i}">Editar rascunho</button>${services?`<button data-approval="${esc(d.id||'')}" ${d.approval?.status==='approved'?'disabled':''}>${d.approval?.status==='pending'?'Rever aprovação':d.approval?.status==='approved'?'Aprovado · demo':'Pedir aprovação'}</button><button disabled title="Nenhum adaptador de envio está disponível">Envio desativado</button>`:''}</div></div>`).join(''):'<div class="empty"><div style="font-size:38px;color:var(--cyan)">✉</div><h3>Uma boa mensagem começa aqui.</h3><p>Os teus rascunhos ficam neste navegador.</p></div>'}</section></div>`}
+function memory(){return `<div class="two"><section class="panel"><div class="section-head"><h2>Contexto que permanece</h2><span class="tag">LOCAL</span></div><p class="subtle">Mantém notas da demonstração, decisões de design e próximos passos.</p><form id="memory"><label>Memória do workspace<textarea name="notes" maxlength="20000" style="min-height:300px">${esc(state.notes)}</textarea></label><div class="row"><button class="primary">Guardar memória</button><span class="subtle">Até 20 000 caracteres</span></div></form></section><section class="panel"><span class="eyebrow">WORKSPACE KNOWLEDGE</span><h2 style="margin-top:16px">Uma fonte de contexto.</h2><div class="item"><h3>01 / Identidade</h3><p>Dark navy, ciano e roxo. Clareza acima do ruído.</p></div><div class="item"><h3>02 / Privacidade</h3><p>Utiliza apenas dados fictícios. Não existe sincronização externa.</p></div><div class="item"><h3>03 / Continuidade</h3><p>Exporta a demonstração em Settings para manter uma cópia.</p></div></section></div>`}
+function automations(){return `<section class="panel"><div class="section-head"><h2>Rotinas com intenção</h2><span class="tag">NÃO EXECUTAM TAREFAS</span></div><p>Configura a aparência do teu cenário. Estas rotinas não são agendadas nem executadas.</p>${[['Briefing diário','Todos os dias · 09:00','ATLAS'],['Revisão semanal','Sexta-feira · 16:00','SENTINEL'],['Resumo de missões','Todos os dias · 18:00','NEXO']].map((a,i)=>`<div class="item row"><div class="row">${avatar(a[2])}<div><h3>${a[0]}</h3><span class="subtle">${a[1]} · ${a[2]}</span></div></div><button role="switch" aria-checked="${state.auto[i]}" aria-label="${a[0]}" data-auto="${i}">${state.auto[i]?'● Ativa na demo':'○ Pausada'}</button></div>`).join('')}</section>`}
+function settings(){return `<div class="two"><section class="panel"><h2>O teu ambiente</h2><div class="item row"><span>Versão</span><b>0.7 · Backend Bridge</b></div><div class="item row"><span>Serviços reais</span><span class="badge">NENHUM LIGADO</span></div><div class="item"><h3>Aplicação e modo offline</h3><p class="subtle" id="pwa-status">${location.protocol==='file:'?'Modo ficheiro: navegação disponível. Instalação e cache offline requerem localhost ou HTTPS.':'A verificar suporte local da PWA…'}</p><button id="install" ${installPrompt?'':'disabled'}>Instalar aplicação</button><p class="subtle">Se o navegador não mostrar instalação, utiliza o menu do navegador. Não foi verificado num dispositivo Android físico.</p></div><div class="item"><h3>Acessibilidade</h3><p class="subtle">Navegação por teclado, foco visível e respeito pela preferência do sistema para movimento reduzido.</p></div></section><section class="panel"><h2>Dados da demonstração</h2><p class="subtle">O formato e a chave de dados são compatíveis com a v0.4. Na mesma origem, ambas partilham o workspace; noutra origem, usa exportação e importação JSON.</p><div class="actions"><button id="export">Exportar dados JSON</button><button id="import">Importar dados JSON</button><input id="import-file" type="file" accept="application/json,.json" hidden></div><div class="item"><h3>Recomeçar</h3><p class="subtle">Repõe apenas os dados deste workspace local. Exporta uma cópia antes de repor; na mesma origem os dados são partilhados com a v0.4.</p><button id="reset">Repor demonstração</button></div></section></div>`}
+
+const primaryPages=['Dashboard','NEXO Chat','Agentes','Mission Control','COMMS'];
+function openMore(){modal('Mais',`<p class="subtle">O teu workspace demonstrativo</p><div class="mobile-nav-grid">${['Memory','Automations','Settings'].map((p,i)=>`<a class="button" href="#${p}"><span aria-hidden="true">${['▦','ϟ','⚙'][i]}</span>${['Memória','Automações','Definições'][i]}</a>`).join('')}</div>`);document.querySelectorAll('.mobile-nav-grid a').forEach(a=>a.onclick=()=>$('#modal').close())}
+function renderMobileNav(page){const nav=$('.bottom-nav');if(!nav)return;nav.innerHTML=primaryPages.map((p,i)=>`<a href="#${p}" aria-label="${p}" ${p===page?'aria-current="page"':''}><span aria-hidden="true">${['◈','⌘','◎','↗','✉'][i]}</span><b>${['Início','Chat','Agentes','Missões','COMMS'][i]}</b></a>`).join('')+`<button id="more-nav" aria-haspopup="dialog" aria-label="Mais secções" ${primaryPages.includes(page)?'':'class="active"'}><span aria-hidden="true">•••</span><b>Mais</b></button>`;if($('#more-nav'))$('#more-nav').onclick=openMore;}
+
+function currentPage(){try{const p=decodeURIComponent(location.hash.slice(1)||'Dashboard');return pages.includes(p)?p:'Dashboard'}catch{return 'Dashboard'}}
+function render(){const page=currentPage();if(document.body?.dataset)document.body.dataset.page=page;renderMobileNav(page);$('aside nav').innerHTML=pages.map((p,i)=>`<a href="#${p}" class="${p===page?'active':''}" ${p===page?'aria-current="page"':''}><span aria-hidden="true">${icons[i]}</span> &nbsp; ${p}</a>`).join('');$('#crumb').textContent=page;$('#unread').textContent=state.notifications.filter(n=>!n.read).length;showStorage();const title={Dashboard:'O teu universo, em sintonia.',Agentes:'Agent Headquarters',Memory:'Memória do workspace',Automations:'Automações',Settings:'Definições'}[page]||page;const sub={Dashboard:'Uma visão clara. Cada agente, cada missão, cada próximo passo.',Agentes:'Sete identidades. Um espaço comum para explorar possibilidades.','Mission Control':'Do objetivo ao resultado. Uma tarefa de cada vez.','NEXO Chat':'Uma conversa com a tua próxima ideia.',COMMS:'Comunicação com intenção. Exclusivamente demonstrativa.',Memory:'As ideias de hoje são o contexto de amanhã.',Automations:'Desenha o ritmo do teu workspace.',Settings:'Uma experiência local, transparente e sob o teu controlo.'}[page];$('#view').innerHTML=`<div class="heading"><div><span class="eyebrow">NEXO HUB / ${page==='Dashboard'?'OVERVIEW':'WORKSPACE'}</span><h1>${title}</h1><p>${sub}</p></div>${page==='Mission Control'?'<button data-new class="primary">＋ Nova missão</button>':page==='Dashboard'?'<span class="tag">◉ TODOS OS DADOS SÃO DEMO</span>':''}</div>`+({Dashboard:dashboard,'NEXO Chat':chatPage,Agentes:agentCards,'Mission Control':missionPage,COMMS:comms,Memory:memory,Automations:automations,Settings:settings}[page])();if(services)window.NexoFoundation?.decorate(page);bind();if(services)window.NexoFoundation?.afterBind(page);if(page==='Settings')updatePwa();}
+function download(name,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function reply(text,id){if(/resum|estado|workspace/i.test(text))return `Resumo demonstrativo do workspace\n\n• ${state.missions.length} missões registadas\n• ${state.missions.filter(m=>M.status(m)==='done').length} concluídas\n• ${state.missions.filter(m=>['blocked','failed'].includes(M.status(m))).length} precisam de atenção\n\nPróximo passo: abre Mission Control e verifica as dependências. Estes números refletem apenas os dados locais.`;return `Plano demonstrativo de ${id}\n\n1. Define um objetivo claro e um critério de sucesso.\n2. Prepara o resultado fictício com ${id}.\n3. Conclui a revisão simulada com SENTINEL.\n\nEste é um exemplo predefinido para explorar a interface. Nenhuma ferramenta foi executada. Podes criar a missão em Mission Control.`}
+function legacySendChat(text,retry=false){if(busy)return;const id=state.activeAgent;if(!retry)state.messages.push({role:'user',text,agent:id});busy=true;chatError='';chatDraft='';save();const wasFocused=document.activeElement?.id==='prompt';render();if(wasFocused)$('#prompt')?.focus();setTimeout(()=>{busy=false;if(failNext){failNext=false;chatError='Falha simulada de resposta. A tua mensagem está guardada; podes tentar novamente.';}else{state.messages.push({role:'assistant',agent:id,text:reply(text,id)});save()}if(currentPage()==='NEXO Chat'){const restoreFocus=document.activeElement?.id==='prompt';render();if(restoreFocus)$('#prompt')?.focus();if($('.chat'))$('.chat').scrollTop=$('.chat').scrollHeight;}else{toast('Resposta simulada preparada no chat.');}},850)}
+function sendChat(text,retry=false){return services?window.NexoFoundation.sendChat(text,retry):legacySendChat(text,retry)}
+function bind(){if($('#mission-picker'))$('#mission-picker').onchange=e=>{selectedMission=e.target.value;render()};document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>newMission(b.dataset.new||'ATLAS'));document.querySelectorAll('[data-mission]').forEach(b=>b.onclick=()=>{selectedMission=b.dataset.mission;if(currentPage()==='Mission Control')render();else{filter='all';location.hash='Mission Control'}});document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render()});document.querySelectorAll('[data-task]').forEach(b=>b.onclick=async()=>{const m=state.missions.find(m=>m.id===selectedMission);if(services){const r=await window.NexoFoundation.command('missions.transition',{id:m.id,taskIndex:Number(b.dataset.task),next:b.dataset.next,expectedRevision:m.revision||0,requestId:services.newRequestId()},b);if(r){notify(r.events[0].text);save();if(currentPage()==='Mission Control'&&b.isConnected)render()}return}if(M.transition(m,Number(b.dataset.task),b.dataset.next)){notify(m.events[0].text);feedback();render()}else toast('Esta tarefa ainda não pode avançar.')});document.querySelectorAll('[data-agent-detail]').forEach(b=>b.onclick=()=>{const a=agent(b.dataset.agentDetail);modal(a.id+' / '+a.role,`${avatar(a.id)}<p>Papel demonstrativo: ${esc(a.skills.join(', '))}.</p><p class="subtle">Sem acesso a ferramentas ou serviços reais. O histórico e as capacidades apresentados são fictícios.</p><button id="open-agent-chat" class="primary">Conversar com ${a.id}</button>`);$('#open-agent-chat').onclick=()=>{state.activeAgent=a.id;save();$('#modal').close();location.hash='NEXO Chat'}});document.querySelectorAll('[data-chat-agent]').forEach(b=>b.onclick=()=>{if(busy){toast('Aguarda a resposta simulada.');return}state.activeAgent=b.dataset.chatAgent;chatDraft='';chatError='';save();if(currentPage()==='NEXO Chat')render();else location.hash='NEXO Chat'});document.querySelectorAll('[data-auto]').forEach(b=>b.onclick=()=>{state.auto[b.dataset.auto]=!state.auto[b.dataset.auto];feedback();render()});document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{$('#prompt').value=b.dataset.prompt;chatDraft=b.dataset.prompt;$('#prompt').focus()});if($('#prompt')){$('#prompt').oninput=e=>{chatDraft=e.target.value;window.NexoMobile?.resizeComposer(e.target)};$('#prompt').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!busy){e.preventDefault();$('#chat').requestSubmit()}};}const sendButton=$('#chat')?.querySelector?.('button');if(sendButton)sendButton.onpointerdown=e=>{if(document.activeElement?.id==='prompt')e.preventDefault()};if($('#chat'))$('#chat').onsubmit=e=>{e.preventDefault();const text=new FormData(e.target).get('text').trim();if(text)sendChat(text)};if($('#simulate-chat-error'))$('#simulate-chat-error').onclick=()=>{failNext=!failNext;render();toast(failNext?'A próxima resposta irá falhar apenas na simulação.':'Falha simulada cancelada.')};if($('#retry-chat'))$('#retry-chat').onclick=()=>{const last=[...state.messages].reverse().find(m=>m.role==='user'&&(m.agent||'NEXO')===state.activeAgent);if(last)sendChat(last.text,true)};
+if($('#draft'))$('#draft').onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));if(!d.subject.trim()||!d.body.trim()){toast('Preenche o assunto e a mensagem.');return}if(services){const r=await window.NexoFoundation.command('comms.save',{...d,requestId:services.newRequestId()},e.target);if(r){notify('Rascunho guardado localmente. Nenhum email enviado.');save();if(currentPage()==='COMMS'&&e.target.isConnected)render()}return}state.drafts.unshift(d);notify('Rascunho guardado localmente. Nenhum email enviado.');feedback();render()};document.querySelectorAll('[data-edit-draft]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.editDraft),d=state.drafts[i];modal('Editar rascunho',`<form id="edit-draft"><label>Destinatário<input name="to" type="email" maxlength="150" required value="${esc(d.to)}"></label><label>Assunto<input name="subject" maxlength="150" required value="${esc(d.subject)}"></label><label>Mensagem<textarea name="body" maxlength="5000" required>${esc(d.body)}</textarea></label><button class="primary">Guardar alterações</button></form>`);$('#edit-draft').onsubmit=async e=>{e.preventDefault();if(services){const r=await window.NexoFoundation.command('comms.save',{...Object.fromEntries(new FormData(e.target)),id:d.id,expectedRevision:d.revision||0,requestId:services.newRequestId()},e.target);if(r&&e.target.isConnected){$('#modal').close();if(currentPage()==='COMMS')render()}return}state.drafts[i]=Object.fromEntries(new FormData(e.target));feedback();$('#modal').close();render()}});if($('#memory'))$('#memory').onsubmit=e=>{e.preventDefault();state.notes=new FormData(e.target).get('notes');feedback()};if($('[data-result]'))$('[data-result]').onclick=()=>{const m=state.missions.find(m=>m.id===selectedMission);download('NEXO-resultado-demonstrativo.txt',`RESULTADO DEMONSTRATIVO — SEM EXECUÇÃO REAL\n${m.title}\n\n${m.tasks.map(t=>`${t.title}: ${labels[t.status]} (${t.agent})`).join('\n')}\n\nRevisão SENTINEL simulada.\n${m.events.map(e=>`${time(e.time)} — ${e.text}`).join('\n')}`,'text/plain')};if($('#export'))$('#export').onclick=()=>download('NEXO-demo-v0.7.json',JSON.stringify(state,null,2));if($('#import'))$('#import').onclick=()=>{if(busy||window.NexoFoundation?.pending()){toast('Aguarda a resposta simulada antes de importar.');return}$('#import-file').click()};if($('#import-file'))$('#import-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>2000000)throw Error();const s=JSON.parse(await f.text());if(!M.valid(s))throw Error();modal('Substituir os dados desta demo?',`<p>O ficheiro contém ${s.missions.length} missões. Esta operação substitui os dados locais deste workspace.</p><button class="primary" id="confirm-import">Importar demonstração</button>`);$('#confirm-import').onclick=()=>{state=s;storageIssue='';services?.simulation.clear();feedback();$('#modal').close();render()}}catch{toast('Ficheiro inválido. Usa uma exportação v0.3/v0.4 até 2 MB.')}};if($('#reset'))$('#reset').onclick=()=>{if(busy||window.NexoFoundation?.pending()){toast('Aguarda a resposta simulada antes de repor os dados.');return}modal('Repor a demonstração?',`<p>As missões, mensagens, rascunhos e notas locais deste workspace serão substituídos pelo cenário inicial. Exporta uma cópia antes, se quiseres mantê-los.</p><button id="confirm-reset">Repor dados demo</button>`);$('#confirm-reset').onclick=()=>{state=M.initial();storageIssue='';services?.simulation.clear();selectedMission=null;filter='all';chatError='';chatDraft='';feedback();$('#modal').close();render()}};if($('#install'))$('#install').onclick=async()=>{if(installPrompt){await installPrompt.prompt();installPrompt=null;render()}};}
+$('#mobile-menu').onclick=()=>{modal('Navegação',`<div class="mobile-nav-grid">${pages.map((p,i)=>`<a class="button" href="#${p}"><span>${icons[i]}</span>${p}</a>`).join('')}</div>`);document.querySelectorAll('.mobile-nav-grid a').forEach(a=>a.onclick=()=>$('#modal').close())};
+$('#notifications').onclick=()=>{modal('Centro de notificações',`<p class="subtle">Eventos deste workspace demonstrativo.</p>${state.notifications.map(n=>`<div class="item notification ${n.read?'':'unread'}"><p>${esc(n.text)}</p><span class="tag">${n.read?'LIDA':'NOVA'}</span></div>`).join('')||'<p>Nenhuma notificação.</p>'}<button id="mark-read" style="margin-top:18px">Marcar todas como lidas</button>`);$('#mark-read').onclick=()=>{state.notifications.forEach(n=>n.read=true);feedback();$('#modal').close();render()}};
+let pwaMessage='Pré-visualização ChatGPT: para instalar PWA é necessário alojamento web próprio.';function updatePwa(){if($('#pwa-status'))$('#pwa-status').textContent=pwaMessage}
+$('.skip').onclick=e=>{e.preventDefault();$('#view').focus()};
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;if(currentPage()==='Settings')render()});addEventListener('hashchange',()=>{render();$('#view').focus();window.scrollTo({top:0})});render();if(false&&'serviceWorker'in navigator&&location.protocol!=='file:'){pwaMessage='A preparar cache local…';navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{pwaMessage='Service worker preparado. A cache inclui a interface e os recursos locais.';updatePwa()}).catch(()=>{pwaMessage='Não foi possível preparar o modo offline neste ambiente.';updatePwa()})}
+
+
+</script><script>
+/* VisualViewport is progressive enhancement; dvh is the fallback. */
+(()=>{let baseline=window.innerHeight;function editable(el){return el&&['TEXTAREA','INPUT','SELECT'].includes(el.tagName)}function sync(){const vv=window.visualViewport;const h=Math.round(vv?.height||window.innerHeight);if(!editable(document.activeElement))baseline=Math.max(window.innerHeight,h);const open=editable(document.activeElement)&&baseline-h>120;document.documentElement.style.setProperty('--app-height',h+'px');document.body.classList.toggle('keyboard-open',open)}function resizeComposer(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px'}window.NexoMobile={resizeComposer};window.visualViewport?.addEventListener('resize',sync);window.visualViewport?.addEventListener('scroll',sync);addEventListener('resize',sync);addEventListener('orientationchange',()=>{baseline=window.innerHeight;sync()});document.addEventListener('focusin',sync);document.addEventListener('focusout',()=>requestAnimationFrame(sync));sync();})();
+
+</script><script>
+/* Shared, dependency-free helpers. No audio recording or provider credentials. */
+(function(root){
+ const STATUS=Object.freeze({ready:'Pronto para conversar',permission:'A aguardar permissão do microfone',listening:'Estou a ouvir...',thinking:'A preparar resposta demonstrativa...',speaking:'NEXO está a falar...',paused:'Microfone em pausa',error:'Verifica a chamada',ended:'Chamada terminada'});
+ function cleanText(value){return String(value??'').replace(/[\x00-\x1f\x7f]/g,' ').replace(/\s+/g,' ').trim().slice(0,2000)}
+ function canChat(s){return s&&s.state==='authenticated'&&['owner','operator'].includes(s.role)}
+ function input(text,id){const result=cleanText(text);if(!result)throw new Error('Mensagem vazia');if(!/^[a-zA-Z0-9_-]{1,100}$/.test(String(id)))throw new Error('Identificador inválido');return {agent:'NEXO',text:result,requestId:id}}
+ const api={STATUS,cleanText,canChat,input};
+ if(typeof module!=='undefined')module.exports=api;else root.NexoVoiceCore=api;
+})(globalThis);
+
+</script><script>
+/* NEXO VOICE PREVIEW - browser speech recognition + synthesis + existing DEMO chat transport.
+   Never sends audio to NEXO/Railway/OpenAI. Browser speech recognition may use its own cloud service.
+   No microphone is opened before a direct user action. No audio recordings are stored. */
+(function(){
+ 'use strict';
+ const C=window.NexoVoiceCore;
+ if(!C||!window.NexoServices)throw Error('NEXO Voice dependencies unavailable');
+ let dialog,recognition=null,open=false,micBusy=false,sending=false,utterance=null,abortController=null,turn=0,token=0;
+ let audioOn=true,autoListen=true,language='pt-PT',phase='ended',currentText='',lastReply='';
+ const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ const Synthesis=window.speechSynthesis||null;
+ const $=(sel)=>dialog?.querySelector(sel);
+ function update(next,detail){phase=next;if(!dialog)return;dialog.dataset.voiceState=next;$('#voice-status').textContent=C.STATUS[next]||next;$('#voice-subtitle').textContent=detail|| (next==='listening'?'Fala naturalmente. O NEXO responde quando terminares.':next==='speaking'?'Podes interromper a resposta a qualquer momento.':'Só são utilizadas respostas demonstrativas.');$('#voice-mic').disabled=next==='thinking';$('#voice-mic').textContent=next==='listening'?'⏸ Pausar microfone':'🎙 '+(Recognition?'Falar agora':'Microfone não disponível');$('#voice-mic').setAttribute('aria-pressed',String(next==='listening'));$('#voice-interrupt').disabled=!(next==='thinking'||next==='speaking');$('#voice-send').disabled=next==='thinking';}
+ function append(who,message){const line=document.createElement('div');line.className='voice-line '+(who==='TU'?'me':'nexo');const header=document.createElement('span');header.className='voice-line-name';header.textContent=who;const body=document.createElement('p');body.textContent=message;line.append(header,body);$('#voice-history').appendChild(line);$('#voice-history').scrollTop=$('#voice-history').scrollHeight;return body;}
+ function stopRecognition(){if(recognition){try{recognition.onend=null;recognition.onresult=null;recognition.onerror=null;recognition.abort()}catch{}recognition=null;}micBusy=false;}
+ function stopAudio(){if(Synthesis){try{Synthesis.cancel()}catch{}}utterance=null;}
+ function stopPending(){token++;abortController?.abort();abortController=null;stopRecognition();stopAudio();sending=false;}
+ function stopCall(){if(!open)return;open=false;stopPending();update('ended');dialog.close();$('#voice-history').replaceChildren();$('#voice-input').value='';currentText='';lastReply='';}
+ function listen(){if(!open||sending)return;if(!Recognition){update('error','Este navegador não disponibiliza reconhecimento de voz. Escreve a frase e usa o áudio de resposta.');return;}token++;stopAudio();stopRecognition();const thisTurn=token;let finished='',hadError=false;try{recognition=new Recognition();recognition.lang=language;recognition.interimResults=true;recognition.continuous=false;recognition.maxAlternatives=1;recognition.onstart=()=>{if(open&&thisTurn===token){micBusy=true;update('listening')}};recognition.onresult=e=>{if(!open||thisTurn!==token)return;let interim='';for(let i=e.resultIndex;i<e.results.length;i++){const value=e.results[i][0]?.transcript||'';if(e.results[i].isFinal)finished+=value;else interim+=value;}$('#voice-live').textContent=C.cleanText(finished+' '+interim)||'A ouvir...';};recognition.onerror=e=>{if(!open||thisTurn!==token)return;hadError=true;micBusy=false;const labels={notAllowed:'Permissão do microfone recusada.', 'not-allowed':'Permissão do microfone recusada.','service-not-allowed':'Serviço de reconhecimento bloqueado.','no-speech':'Não detetei fala. Toca em «Falar agora» para tentar de novo.',network:'O reconhecimento do navegador não está disponível na rede.', 'audio-capture':'Microfone não disponível.'};update('error',labels[e.error]||'Não foi possível reconhecer a fala. Podes escrever em vez disso.');};recognition.onend=()=>{if(!open||thisTurn!==token)return;recognition=null;micBusy=false;$('#voice-live').textContent='';if(hadError)return;const text=C.cleanText(finished);if(text)void send(text,'voz');else update('paused','Não foi transcrita uma frase. Toca em «Falar agora» para tentar novamente.');};update('permission','O navegador poderá pedir acesso ao microfone. O reconhecimento de voz pode utilizar serviços do fornecedor do navegador.');recognition.start();}catch(e){micBusy=false;recognition=null;update('error','Não consegui iniciar o microfone: '+String(e?.message||'erro').slice(0,110));}}
+ function speak(text){if(!open)return;lastReply=text;const spoken=C.cleanText(text).slice(0,2000);if(!audioOn||!Synthesis||!window.SpeechSynthesisUtterance){update('paused',!Synthesis?'Áudio de saída não suportado neste navegador.':'Áudio desligado. A resposta está na transcrição.');return;}const ticket=token;stopAudio();try{const u=new SpeechSynthesisUtterance(spoken);utterance=u;u.lang=language;u.rate=1;u.pitch=1;u.volume=0.9;const vs=Synthesis.getVoices?.()||[];const v=vs.find(x=>x.lang?.toLowerCase()===language.toLowerCase())||vs.find(x=>x.lang?.toLowerCase().startsWith(language.slice(0,2).toLowerCase()));if(v)u.voice=v;u.onstart=()=>{if(open&&ticket===token)update('speaking');};u.onend=()=>{if(!open||ticket!==token)return;utterance=null;update('paused','Podes fazer outra pergunta ou ativar novamente o microfone.');if(autoListen&&Recognition)listen();};u.onerror=()=>{if(open&&ticket===token){utterance=null;update('paused','A voz do navegador não conseguiu reproduzir a resposta. Usa a transcrição ou tenta novamente.')}};update('speaking');Synthesis.speak(u);}catch{update('error','Não foi possível reproduzir a resposta falada. Podes ler a transcrição.');}}
+ async function send(text,source){const safe=C.cleanText(text);if(!safe||!open||sending)return;stopRecognition();stopAudio();const s=services?.auth?.current?.();if(!C.canChat(s)){update('error','Inicia sessão com o perfil owner ou operator em Definições para falar com o NEXO demonstrativo.');return;}const ticket=++token;sending=true;const controller=new AbortController();abortController=controller;append('TU',safe);const assistant=append('NEXO','…');$('#voice-live').textContent='';$('#voice-input').value='';update('thinking');let reply='',error=null,done=false;try{const input=C.input(safe,services.newRequestId());for await(const ev of services.chat.stream(input,{signal:controller.signal})){if(!open||ticket!==token)return;if(ev.type==='delta'){reply+=ev.data.text;assistant.textContent=reply;$('#voice-history').scrollTop=$('#voice-history').scrollHeight;}if(ev.type==='done')done=true;if(ev.type==='error'||ev.type==='cancelled'){error=ev.data.message||'Resposta interrompida';break;}}}catch(e){error=e.message||'Falha ao obter resposta demonstrativa.';}finally{if(ticket===token){sending=false;abortController=null;}}
+ if(!open||ticket!==token)return;
+ if(error||!done){assistant.textContent=reply||'Resposta não concluída.';update('error',error||'O servidor não terminou a resposta. Podes tentar novamente.');return;}
+ if(!reply){update('error','O NEXO não devolveu texto nesta tentativa.');return;}
+ assistant.textContent=reply; // textContent only; remote markup cannot execute.
+ if(typeof currentPage==='function'&&currentPage()==='NEXO Chat'&&typeof render==='function')render();
+ speak(reply);
+ }
+ function interrupt(){if(!open)return;stopPending();update('paused','Resposta interrompida. Podes iniciar outra pergunta.');}
+ function build(){dialog=document.createElement('dialog');dialog.id='nexo-voice-dialog';dialog.className='voice-dialog';dialog.setAttribute('aria-labelledby','voice-title');dialog.innerHTML=`<div class="voice-shell"><div class="voice-top"><div><span class="voice-overline">NEXO HUB / VOICE PREVIEW</span><h2 id="voice-title">Chamada com NEXO</h2></div><button type="button" id="voice-close" aria-label="Terminar chamada" title="Terminar chamada">✕</button></div><div class="voice-stage"><div class="voice-halo"><span class="voice-glow"></span><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJiZyI+PHN0b3Agc3RvcC1jb2xvcj0iIzYyZTZmZiIgc3RvcC1vcGFjaXR5PSIuMjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjEyMjUiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0ibWV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjNWE2YTkxIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iIzI1MzM0ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEwMTgyZCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIj48c3RvcCBzdG9wLWNvbG9yPSIjNjJlNmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNjJlNmZmIiBzdG9wLW9wYWNpdHk9Ii4xMiIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iZ2xvdyI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSIjMGIxMjIyIi8+PHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjEyNiIgaGVpZ2h0PSIxMjYiIHJ4PSIyNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iIzYyZTZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4yNSIvPjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiM2MmU2ZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTIiLz48cGF0aCBkPSJNMTkgNDRWMjhIMzVNOTMgMTAwSDEwOVY4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjJlNmZmIiBzdHJva2Utb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNMjYgMTI4UTMwIDEwMyA0OSA5OUw2NCAxMTIgNzkgOTlROTggMTAzIDEwMiAxMjgiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiM1MzY4OGUiIHN0cm9rZS1vcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik02NCA0MCBMODggNjAgODggODYgNjQgMTA2IDQwIDg2IDQwIDYwWiIgZmlsbD0idXJsKCNtZXRhbCkiIHN0cm9rZT0idXJsKCNlZGdlKSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNNDMgNTdRNjQgNDkgODUgNTdMODIgNzdRNjQgODUgNDYgNzdaIiBmaWxsPSIjMDgwZjIwIi8+PHBhdGggZD0iTTQ5IDY1TDYxIDcwIDQ5IDc0TTc5IDY1TDY3IDcwIDc5IDc0IiBzdHJva2U9IiM2MmU2ZmYiIHN0cm9rZS13aWR0aD0iNSIgZmlsbD0ibm9uZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIiBvcGFjaXR5PSIuNyIvPjxwYXRoIGQ9Ik00OSA2NUw2MSA3MCA0OSA3NE03OSA2NUw2NyA3MCA3OSA3NCIgc3Ryb2tlPSIjNjJlNmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik01NSA4OEw2NCA5MiA3MyA4OE02NCA0MVY0OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjJlNmZmIiBzdHJva2Utb3BhY2l0eT0iLjciLz48Y2lyY2xlIGN4PSI2NCIgY3k9IjExNyIgcj0iMyIgZmlsbD0iIzYyZTZmZiIvPjxwYXRoIGQ9Ik02IDY1SDE3TTExMSA2NUgxMjIiIHN0cm9rZT0iIzYyZTZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii40Ii8+PC9zdmc+" alt="Avatar do NEXO" width="120" height="120"></div><h3>NEXO</h3><div class="voice-mode">VOZ DEMONSTRATIVA · SEM IA REAL</div><div class="voice-wave" aria-hidden="true">${Array.from({length:35},(_,i)=>`<i style="--i:${i};--h:${8+Math.round(35*Math.abs(Math.sin(i*.87)*Math.cos(i*.21)))}px"></i>`).join('')}</div><p id="voice-status" role="status">Pronto para conversar</p><p id="voice-subtitle">Só são utilizadas respostas demonstrativas.</p><div id="voice-live" aria-live="polite"></div></div><div id="voice-history" class="voice-history" aria-label="Transcrição desta chamada" role="log"></div><form id="voice-form" class="voice-text"><label for="voice-input">Escrever uma frase (alternativa ao microfone)</label><div class="voice-text-row"><input id="voice-input" maxlength="2000" placeholder="Ex.: NEXO, resume as missões..." autocomplete="off"><button type="submit" id="voice-send">Enviar</button></div></form><div class="voice-settings"><label><input type="checkbox" id="voice-audio" checked> Resposta falada</label><label><input type="checkbox" id="voice-auto" checked> Continuar a ouvir</label><label>Idioma <select id="voice-lang" aria-label="Idioma da chamada"><option value="pt-PT">Português PT</option><option value="pt-BR">Português BR</option><option value="en-US">English</option><option value="de-DE">Deutsch</option></select></label></div><div class="voice-controls"><button type="button" id="voice-mic" class="voice-mic">🎙 Falar agora</button><button type="button" id="voice-interrupt" disabled>⏹ Interromper</button><button type="button" id="voice-hangup" class="voice-hangup">☎ Terminar</button></div><p class="voice-privacy">Sem gravação de áudio nesta app. O texto enviado fica no histórico demonstrativo do Chat. O reconhecimento de fala do navegador pode utilizar serviços externos. Não é a API Realtime do NEXO.</p></div>`;document.body.appendChild(dialog);
+ $('#voice-close').onclick=stopCall;$('#voice-hangup').onclick=stopCall;$('#voice-mic').onclick=()=>{if(phase==='listening'){stopRecognition();update('paused','Microfone em pausa.');}else listen()};$('#voice-interrupt').onclick=interrupt;$('#voice-audio').onchange=e=>{audioOn=e.target.checked;if(!audioOn&&phase==='speaking'){stopAudio();update('paused','Resposta sonora interrompida.');}};$('#voice-auto').onchange=e=>autoListen=e.target.checked;$('#voice-lang').onchange=e=>language=e.target.value;$('#voice-form').onsubmit=e=>{e.preventDefault();void send($('#voice-input').value,'texto')};dialog.addEventListener('cancel',e=>{e.preventDefault();stopCall()});dialog.addEventListener('close',()=>{if(open)stopCall()});}
+ function openCall(){if(!dialog)build();if(open){dialog.focus();return;}open=true;token++;audioOn=$('#voice-audio').checked;autoListen=$('#voice-auto').checked;language=$('#voice-lang').value;dialog.showModal();update('ready',Recognition?'Primeiro toca em «Falar agora» para autorizar o microfone.':'Reconhecimento de voz não disponível aqui. Podes escrever e ouvir as respostas.');append('NEXO','Bem-vindo ao NEXO Voice. Esta chamada utiliza respostas demonstrativas e não liga à IA real.');$('#voice-mic').focus()}
+ document.addEventListener('click',e=>{if(e.target.closest('#nexo-voice-open,[data-voice-open]'))openCall()});
+ window.NexoVoice={open:openCall,hangup:stopCall,getState:()=>({open,phase,sending,recognized:!!Recognition,tts:!!Synthesis})};
+})();
+
+</script></body></html>
