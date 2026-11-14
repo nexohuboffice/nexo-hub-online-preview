@@ -1,0 +1,11 @@
+{
+  "name": "nexo-hub-readonly-gateway",
+  "private": true,
+  "version": "0.8.0-candidate",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test github-gateway.test.mjs http-smoke.test.mjs",
+    "start": "node github-gateway.mjs"
+  }
+}
