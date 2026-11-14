@@ -2,6 +2,7 @@
  * Not deployed. No shared authenticated origin with the mutable public PWA.
  * No access to repository contents, emails, missions, COMMS, OpenAI, or writes.
  */
+import {createRailwayOAuth} from './railway-oauth.mjs';
 import {dashboard} from './dashboard.mjs';
 import { createServer } from 'node:http';
 import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
@@ -62,6 +63,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   const name=secure?'__Host-nexo_sid':'nexo_local_sid';
   const stateName=secure?'__Host-nexo_oauth':'nexo_local_oauth';
   const states=new Map(),sessions=new Map();
+  const railwayOAuth=createRailwayOAuth(config,{http,now});
   let cache={until:0,value:null}, statusInFlight=null;
   let loginWindow={until:0,count:0}, callbackWindow={until:0,count:0};
   function allowAuth(kind){
@@ -138,6 +140,10 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     if(url.origin!==originUrl || (suppliedHost && suppliedHost.toLowerCase()!==parsed.host.toLowerCase()))
       return withHeaders(json({error:'Host not allowed'},421),secure);
     const path=url.pathname;prune();
+    if(path==='/railway'||path.startsWith('/railway/')){
+      const owner=session(req)?SHA256(cookieValue(req,name)):null;
+      return withHeaders(await railwayOAuth.handle(req,owner),secure,path==='/railway'?'same-origin':'no-referrer');
+    }
     if(req.method==='GET'&&path==='/health')return withHeaders(json({ok:true,service:'NEXO read-only gateway',version:'0.8-local-candidate'}),secure);
     if(req.method==='GET'&&path==='/auth/login'){
       if(!allowAuth('login'))return withHeaders(json({error:'Try again later'},429),secure);
@@ -165,7 +171,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     if(req.method==='GET'&&path==='/api/session')return withHeaders(json({authenticated:session(req),readOnly:true}),secure);
     if(req.method==='POST'&&path==='/auth/logout'){
       if(req.headers.get('origin')!==originUrl)return withHeaders(json({error:'Invalid origin'},403),secure);
-      const sid=cookieValue(req,name);if(HEX_64.test(sid))sessions.delete(SHA256(sid));
+      const sid=cookieValue(req,name);if(HEX_64.test(sid)){sessions.delete(SHA256(sid));railwayOAuth.forget(SHA256(sid));}
       return withHeaders(redirect('/',303,{'Set-Cookie':expiredCookie(name,secure)}),secure);
     }
     if(req.method==='GET'&&path==='/'){
