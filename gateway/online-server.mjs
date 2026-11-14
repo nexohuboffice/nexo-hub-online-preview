@@ -15,6 +15,8 @@ export function onlineConfig(env){
   return {origin,githubClientId:env.GITHUB_OAUTH_CLIENT_ID,
     githubClientSecret:env.GITHUB_OAUTH_CLIENT_SECRET,ownerGitHubId:env.GITHUB_OWNER_ID,
     projectId:env.RAILWAY_PROJECT_ID,environmentId:env.RAILWAY_ENVIRONMENT_ID,
+    railwayClientId:env.NEXO_RAILWAY_OAUTH_CLIENT_ID,
+    railwayClientSecret:env.NEXO_RAILWAY_OAUTH_CLIENT_SECRET,
     railwayToken:null,privateHealth:true};
 }
 
