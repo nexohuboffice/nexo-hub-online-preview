@@ -107,7 +107,7 @@ test('tampered sessions, expiration and logout revocation',async()=>{
  const m=setup(),x=await m.login();
  const invalid=await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie+'f'}));assert.equal(invalid.status,401);
  const blocked=await m.g.handle(m.request('/auth/logout',{Cookie:x.sessionCookie,Origin:'https://attacker.com'},'POST'));assert.equal(blocked.status,403);
- const out=await m.g.handle(m.request('/auth/logout',{Cookie:x.sessionCookie,Origin:origin},'POST'));assert.equal(out.status,204);
+ const out=await m.g.handle(m.request('/auth/logout',{Cookie:x.sessionCookie,Origin:origin},'POST'));assert.equal(out.status,303);assert.equal(out.headers.get('location'),'/');
  assert.equal((await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}))).status,401);
  const second=await m.login();m.clock.advance(2*3600_000+1);
  assert.equal((await m.g.handle(m.request('/api/status',{Cookie:second.sessionCookie}))).status,401);
@@ -172,4 +172,15 @@ test('one-off IMMO bootstrap is never treated as an HTTP service',async()=>{
  const data=await r.json();
  assert.equal(data.services.find(s=>s.id==='immo-discord-bootstrap').state,'not_monitored');
  assert.equal(m.calls.filter(c=>c.url.includes('immo-discord-bootstrap.railway.internal')).length,0);
+});
+
+test('only homepage permits same-origin form origin; logout rejects null origin',async()=>{
+ const m=setup(),x=await m.login();
+ const home=await m.g.handle(m.request('/',{Cookie:x.sessionCookie}));
+ assert.equal(home.headers.get('referrer-policy'),'same-origin');
+ const health=await m.g.handle(m.request('/health'));
+ assert.equal(health.headers.get('referrer-policy'),'no-referrer');
+ const denied=await m.g.handle(m.request('/auth/logout',{Cookie:x.sessionCookie,Origin:'null'},'POST'));
+ assert.equal(denied.status,403);
+ assert.equal((await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}))).status,200);
 });
