@@ -2,6 +2,7 @@
  * Not deployed. No shared authenticated origin with the mutable public PWA.
  * No access to repository contents, emails, missions, COMMS, OpenAI, or writes.
  */
+import {dashboard} from './dashboard.mjs';
 import { createServer } from 'node:http';
 import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 
@@ -46,7 +47,7 @@ function withHeaders(response,secure,referrerPolicy='no-referrer'){
   if(secure)headers.set('Strict-Transport-Security','max-age=31536000; includeSubDomains');
   return new Response(response.body,{status:response.status,headers});
 }
-function page(isAuthenticated){return `<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>NEXO HUB · Private Gateway</title></head><body style="font:16px system-ui;background:#080f20;color:#ebf6ff;padding:32px;max-width:650px;margin:0 auto"><h1>NEXO HUB · v0.8</h1><p>Gateway privado de consulta. Não executa missões, ações ou envios.</p>${isAuthenticated?'<p>🔒 Sessão de proprietário ativa.</p><p><a style="color:#78dced" href="/api/status">Consultar estado dos 12 serviços (JSON)</a></p><form method="POST" action="/auth/logout"><button>Terminar sessão</button></form>':'<a style="color:#78dced" href="/auth/login">Entrar com GitHub</a>'}<p style="font-size:12px;color:#9cb2d0">A aplicação pública GitHub Pages permanece separada deste gateway.</p></body></html>`;}
+
 
 /** @param {object} config @param {object} injected - mocks for deterministic tests, never production secrets */
 export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=random}={}){
@@ -167,7 +168,11 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
       const sid=cookieValue(req,name);if(HEX_64.test(sid))sessions.delete(SHA256(sid));
       return withHeaders(redirect('/',303,{'Set-Cookie':expiredCookie(name,secure)}),secure);
     }
-    if(req.method==='GET'&&path==='/')return withHeaders(content(page(session(req))),secure,'same-origin');
+    if(req.method==='GET'&&path==='/'){
+      const authenticated=session(req);let data=null;
+      if(authenticated){try{if(!statusInFlight)statusInFlight=status().finally(()=>{statusInFlight=null});data=await statusInFlight;}catch{}}
+      return withHeaders(content(dashboard(authenticated,data)),secure,'same-origin');
+    }
     if(req.method==='GET'&&path==='/api/status'){
       if(!session(req))return withHeaders(json({error:'Login required'},401),secure);
       try{if(!statusInFlight)statusInFlight=status().finally(()=>{statusInFlight=null});const result=await statusInFlight;return withHeaders(result?json(result):json({error:'Railway source not configured'},503),secure)}catch{return withHeaders(json({error:'Read-only service status unavailable'},503),secure)}
