@@ -3,7 +3,7 @@
   'use strict';
   const LIVE_META='meta[name="nexo-backend-mode"][content="same-origin"]';
   const isGateway=!!document.querySelector(LIVE_META);
-  const CORE_LOGIN='https://nexo-discord-production.up.railway.app/login';
+  const GATEWAY='https://nexo-owner-gateway-production.up.railway.app/';
   const SOURCE='status-snapshot.json';
   const allowedStates=new Set(['online','last_succeeded','unreachable','not_monitored']);
   let last=null, request=null;
@@ -36,22 +36,22 @@
     const wrap=el('section','nexo-ops-panel');wrap.id='nexo-ops-panel';wrap.setAttribute('aria-labelledby','nexo-ops-title');
     const top=el('div','nexo-ops-top');const left=el('div');
     left.append(el('span','nexo-ops-kicker','NEXO HUB / OPERAÇÕES · v0.8'));
-    const h=el('h2','',isGateway?'Centro de estado — privado':'Estado real — última auditoria');h.id='nexo-ops-title';left.append(h);
-    left.append(el('p','',isGateway?'Consulta autenticada do estado dos serviços. Nenhuma ação é executada.':'Dados reais recolhidos por consulta de leitura ao Railway. Não são atualizados em tempo real.'));
+    const h=el('h2','',isGateway?'Centro de estado — privado':'Estado dos serviços · acesso privado');h.id='nexo-ops-title';left.append(h);
+    left.append(el('p','',isGateway?'Consulta autenticada do estado dos serviços. Nenhuma ação é executada.':'Entra com GitHub para consultar o estado atual. Os cartões abaixo são apenas a auditoria histórica.'));
     top.append(left,el('span','nexo-ops-chip',isGateway?'🔐 ACESSO AUTENTICADO':'◷ SNAPSHOT VERIFICADO'));
     const actions=el('div','nexo-ops-actions');const button=el('button','',isGateway?'Atualizar verificação':'Recarregar snapshot');button.type='button';button.disabled=false;button.addEventListener('click',async()=>{button.disabled=true;button.textContent='A consultar…';await refresh(wrap);button.disabled=false;button.textContent=isGateway?'Verificar novamente':'Recarregar snapshot';});
     actions.append(button);
-    if(!isGateway){actions.append(link('Abrir Control Center privado ↗',CORE_LOGIN));}
+    if(!isGateway){const login=link('Entrar com GitHub · estado real',GATEWAY);login.target='_self';actions.prepend(login);}
     const caption=el('div','nexo-ops-caption','');caption.id='nexo-ops-when';caption.textContent='A carregar…';
     const list=el('div','nexo-ops-grid');list.id='nexo-ops-services';list.setAttribute('aria-live','polite');
     const more=el('button','nexo-ops-more','Ver todos os serviços');more.type='button';more.hidden=true;more.addEventListener('click',()=>{more.hidden=true;list.replaceChildren();if(last)last.services.forEach(s=>addService(list,s));});
     const foot=el('p','nexo-ops-note',isGateway?'A leitura de endpoints internos não substitui verificações funcionais. As tarefas agendadas não são consideradas offline.':'O painel das missões, Chat, COMMS e Voice continua DEMONSTRATIVO nesta página. Não usa credenciais nem permite alterações reais.');
-    const notice=el('div','nexo-ops-foot',isGateway?'Os dados são tratados no gateway privado e não guardados na app.':'Para aceder a dados privados, usa o Control Center oficial. A integração autenticada nesta app exige o novo gateway.');
+    const notice=el('div','nexo-ops-foot',isGateway?'Os dados são tratados no gateway privado e não guardados na app.':'O painel privado NEXO abre no gateway seguro. A sessão GitHub e os estados atuais ficam nesse domínio; esta página mostra apenas a auditoria histórica.');
     wrap.append(top,actions,caption,list,more,foot,notice);return wrap;
   }
   function addService(grid,s){
     const tile=el('div','nexo-ops-service');const title=el('strong','',s.id);const small=el('small','');const dot=el('i','nexo-ops-dot');
-    let text='Online';if(s.state==='last_succeeded'){text='Última execução concluída';dot.classList.add('pending')}else if(s.state==='unreachable'){text='Sem resposta à sondagem';dot.classList.add('problem')}else if(s.state==='not_monitored'){text='Cron — não sondado';dot.classList.add('pending')}
+    let text='Online';if(s.state==='last_succeeded'){text='Última execução concluída';dot.classList.add('pending')}else if(s.state==='unreachable'){text='Sem resposta à sondagem';dot.classList.add('problem')}else if(s.state==='not_monitored'){text=s.id==='immo-discord-bootstrap'?'Provisionador — não sondado':'Tarefa agendada — não sondada';dot.classList.add('pending')}
     small.append(dot,document.createTextNode(text));tile.append(title,small);grid.append(tile);
   }
   async function refresh(panel){
@@ -71,6 +71,6 @@
   const watcher=new MutationObserver(()=>{if(document.body?.dataset?.page==='Dashboard'&&!$('#nexo-ops-panel'))install();});
   const view=$('#view');if(view)watcher.observe(view,{childList:true});
   const header=$('main header .row');
-  if(header&&!$('#nexo-ops-open')){const btn=el('button','nexo-ops-shortcut');btn.id='nexo-ops-open';btn.type='button';btn.title='Ver estado dos serviços';btn.setAttribute('aria-label','Ver estado dos serviços');const dot=el('span','nexo-ops-indicator');btn.append(dot,el('span','','NEXO Status'));btn.addEventListener('click',()=>{location.hash='Dashboard';setTimeout(()=>$('#nexo-ops-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),80)});const voice=$('#nexo-voice-open');voice?.before(btn);}
+  if(header&&!$('#nexo-ops-open')){const btn=el('a','nexo-ops-shortcut');btn.id='nexo-ops-open';btn.href=GATEWAY;btn.rel='noreferrer';btn.title='Entrar com GitHub e ver estado real';btn.setAttribute('aria-label','Entrar com GitHub e ver estado real');const dot=el('span','nexo-ops-indicator');btn.append(dot,el('span','','NEXO · Estado real'));const voice=$('#nexo-voice-open');voice?.before(btn);}
   install();window.NexoOps={mode:isGateway?'authenticated-read-only':'public-snapshot',refresh:()=>{const panel=$('#nexo-ops-panel');if(panel)return refresh(panel);}};
 })();
