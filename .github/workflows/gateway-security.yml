@@ -19,6 +19,6 @@ jobs:
           node-version: '22'
       - name: Test simulated providers and HTTP boundary
         working-directory: gateway
-        run: node --test github-gateway.test.mjs http-smoke.test.mjs online-server.test.mjs
+        run: node --test github-gateway.test.mjs http-smoke.test.mjs online-server.test.mjs railway-oauth.test.mjs
       - name: Build gateway image without secrets
         run: docker build -t nexo-gateway-check gateway
