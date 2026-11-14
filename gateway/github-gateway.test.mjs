@@ -184,3 +184,24 @@ test('only homepage permits same-origin form origin; logout rejects null origin'
  assert.equal(denied.status,403);
  assert.equal((await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}))).status,200);
 });
+
+test('anonymous dashboard has login but no private service data or probes',async()=>{
+ const m=setup({health:true,noToken:true});const r=await m.g.handle(m.request('/'));const html=await r.text();
+ assert.match(html,/Entrar com GitHub/);assert.doesNotMatch(html,/nexo-discord/);assert.equal(m.calls.length,0);
+});
+test('owner dashboard renders real health cards and shares API cache',async()=>{
+ const m=setup({health:true,noToken:true,failHealth:'nexo-browser'}),x=await m.login();
+ const r=await m.g.handle(m.request('/',{Cookie:x.sessionCookie}));const html=await r.text();
+ assert.match(html,/Última verificação/);assert.match(html,/Sem resposta à sondagem/);
+ for(const id of EXPECTED_SERVICES)assert.ok(html.includes(id));
+ assert.match(html,/Provisionador · sem endpoint HTTP/);
+ assert.doesNotMatch(html,/SHOULD_NEVER_LEAK|FAKE_ACCESS_TOKEN|<script/);
+ assert.equal(m.countHealth(),8);
+ await m.g.handle(m.request('/api/status',{Cookie:x.sessionCookie}));
+ assert.equal(m.countHealth(),8);assert.equal(m.calls.some(c=>c.url.includes('backboard')),false);
+});
+test('dashboard reports unavailable source without inventing status',async()=>{
+ const m=setup({noToken:true}),x=await m.login();
+ const html=await(await m.g.handle(m.request('/',{Cookie:x.sessionCookie}))).text();
+ assert.match(html,/Não foi possível consultar o estado/);assert.doesNotMatch(html,/Respondeu à sondagem/);
+});
