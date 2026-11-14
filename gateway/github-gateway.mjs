@@ -61,7 +61,13 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   const name=secure?'__Host-nexo_sid':'nexo_local_sid';
   const stateName=secure?'__Host-nexo_oauth':'nexo_local_oauth';
   const states=new Map(),sessions=new Map();
-  let cache={until:0,value:null};
+  let cache={until:0,value:null}, statusInFlight=null;
+  let loginWindow={until:0,count:0}, callbackWindow={until:0,count:0};
+  function allowAuth(kind){
+    const window=kind==='login'?loginWindow:callbackWindow;
+    if(window.until<=now()){window.until=now()+60_000;window.count=0;}
+    return ++window.count<=20;
+  }
   function prune(){
     for(const [key,val] of states)if(val<=now())states.delete(key);
     for(const [key,val] of sessions)if(val.expires<=now())sessions.delete(key);
@@ -71,7 +77,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   function session(req){prune();const raw=cookieValue(req,name);if(!HEX_64.test(raw))return false;const s=sessions.get(SHA256(raw));return !!s&&s.expires>now()&&s.userId===String(ownerGitHubId);}
   async function githubProfile(code){
     const tokenRes=await http('https://github.com/login/oauth/access_token',{
-      method:'POST',headers:{Accept:'application/json','Content-Type':'application/json'},
+      method:'POST',redirect:'error',headers:{Accept:'application/json','Content-Type':'application/json'},
       body:JSON.stringify({client_id:githubClientId,client_secret:githubClientSecret,code,redirect_uri:callback}),
       signal:AbortSignal.timeout(8000)
     });
@@ -79,7 +85,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     const tokenData=await tokenRes.json();
     if(typeof tokenData.access_token!=='string'||!tokenData.access_token||tokenData.error||String(tokenData.scope||'').trim())throw Error('Unauthorized OAuth scopes or token');
     const me=await http('https://api.github.com/user',{
-      method:'GET',headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+tokenData.access_token,'X-GitHub-Api-Version':'2022-11-28'},
+      method:'GET',redirect:'error',headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+tokenData.access_token,'X-GitHub-Api-Version':'2022-11-28'},
       signal:AbortSignal.timeout(8000)
     });
     if(!me.ok)throw Error('GitHub identity unavailable');
@@ -114,8 +120,10 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
       if(CRON_SERVICES.includes(id)||NON_HTTP_SERVICES.includes(id))return {id,state:'not_monitored',deployment};
       if(!privateHealth)return {id,state:'not_monitored',deployment};
       try{
-        const r=await http(`http://${id}.railway.internal:8080/health`,{method:'GET',headers:{Accept:'application/json'},signal:AbortSignal.timeout(1600)});
-        return {id,state:r.ok?'online':'unreachable',deployment};
+        const r=await http(`http://${id}.railway.internal:8080/health`,{method:'GET',redirect:'manual',headers:{Accept:'application/json'},signal:AbortSignal.timeout(1600)});
+        const online=r.ok;
+        await r.body?.cancel();
+        return {id,state:online?'online':'unreachable',deployment};
       }catch{return {id,state:'unreachable',deployment};}
     }));
     const value={schema:'nexo.gateway.status.v1',checkedAt:new Date(now()).toISOString(),serviceCount:services.length,readOnly:true,privateDataIncluded:false,services};
@@ -131,6 +139,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     const path=url.pathname;prune();
     if(req.method==='GET'&&path==='/health')return withHeaders(json({ok:true,service:'NEXO read-only gateway',version:'0.8-local-candidate'}),secure);
     if(req.method==='GET'&&path==='/auth/login'){
+      if(!allowAuth('login'))return withHeaders(json({error:'Try again later'},429),secure);
       const state=nonce();if(!HEX_64.test(state))throw Error('Insufficient OAuth state entropy');
       states.set(SHA256(state),now()+STATE_TTL);prune();
       const target=new URL('https://github.com/login/oauth/authorize');
@@ -138,6 +147,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
       return withHeaders(redirect(target.toString(),302,{'Set-Cookie':cookie(stateName,state,600,secure,'Lax')}),secure);
     }
     if(req.method==='GET'&&path==='/auth/callback'){
+      if(!allowAuth('callback'))return withHeaders(json({error:'Try again later'},429),secure);
       const returned=url.searchParams.get('state'),expected=cookieValue(req,stateName);
       if(!equal(returned,expected)||!states.has(SHA256(returned))||states.get(SHA256(returned))<=now())return withHeaders(json({error:'OAuth state invalid or expired'},403),secure);
       states.delete(SHA256(returned));
@@ -160,7 +170,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     if(req.method==='GET'&&path==='/')return withHeaders(content(page(session(req))),secure);
     if(req.method==='GET'&&path==='/api/status'){
       if(!session(req))return withHeaders(json({error:'Login required'},401),secure);
-      try{const result=await status();return withHeaders(result?json(result):json({error:'Railway source not configured'},503),secure)}catch{return withHeaders(json({error:'Read-only service status unavailable'},503),secure)}
+      try{if(!statusInFlight)statusInFlight=status().finally(()=>{statusInFlight=null});const result=await statusInFlight;return withHeaders(result?json(result):json({error:'Railway source not configured'},503),secure)}catch{return withHeaders(json({error:'Read-only service status unavailable'},503),secure)}
     }
     return withHeaders(json({error:'Not found or method not allowed'},404),secure);
   }
