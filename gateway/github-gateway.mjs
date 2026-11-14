@@ -33,11 +33,11 @@ const content = html => new Response(html,{headers:{'Content-Type':'text/html; c
 function cookieValue(request,name){return (request.headers.get('cookie')||'').split(';').map(x=>x.trim()).filter(x=>x.startsWith(name+'='))[0]?.slice(name.length+1)||'';}
 function cookie(name,val,seconds,secure,sameSite='Lax') {return `${name}=${val}; HttpOnly; ${secure?'Secure; ':''}Path=/; SameSite=${sameSite}; Max-Age=${seconds}`;}
 function expiredCookie(name,secure){return cookie(name,'',0,secure);}
-function withHeaders(response,secure){
+function withHeaders(response,secure,referrerPolicy='no-referrer'){
   const headers=new Headers(response.headers);
   for(const [k,v] of Object.entries({
     'Cache-Control':'no-store, private', 'Pragma':'no-cache',
-    'X-Content-Type-Options':'nosniff', 'Referrer-Policy':'no-referrer',
+    'X-Content-Type-Options':'nosniff', 'Referrer-Policy':referrerPolicy,
     'X-Frame-Options':'DENY', 'Cross-Origin-Opener-Policy':'same-origin',
     'Cross-Origin-Resource-Policy':'same-origin',
     'Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; style-src 'unsafe-inline'",
@@ -165,9 +165,9 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     if(req.method==='POST'&&path==='/auth/logout'){
       if(req.headers.get('origin')!==originUrl)return withHeaders(json({error:'Invalid origin'},403),secure);
       const sid=cookieValue(req,name);if(HEX_64.test(sid))sessions.delete(SHA256(sid));
-      return withHeaders(new Response(null,{status:204,headers:{'Set-Cookie':expiredCookie(name,secure)}}),secure);
+      return withHeaders(redirect('/',303,{'Set-Cookie':expiredCookie(name,secure)}),secure);
     }
-    if(req.method==='GET'&&path==='/')return withHeaders(content(page(session(req))),secure);
+    if(req.method==='GET'&&path==='/')return withHeaders(content(page(session(req))),secure,'same-origin');
     if(req.method==='GET'&&path==='/api/status'){
       if(!session(req))return withHeaders(json({error:'Login required'},401),secure);
       try{if(!statusInFlight)statusInFlight=status().finally(()=>{statusInFlight=null});const result=await statusInFlight;return withHeaders(result?json(result):json({error:'Railway source not configured'},503),secure)}catch{return withHeaders(json({error:'Read-only service status unavailable'},503),secure)}
