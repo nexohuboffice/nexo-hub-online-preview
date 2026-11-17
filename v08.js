@@ -41,12 +41,12 @@
     top.append(left,el('span','nexo-ops-chip',isGateway?'🔐 ACESSO AUTENTICADO':'◷ SNAPSHOT VERIFICADO'));
     const actions=el('div','nexo-ops-actions');const button=el('button','',isGateway?'Atualizar verificação':'Recarregar snapshot');button.type='button';button.disabled=false;button.addEventListener('click',async()=>{button.disabled=true;button.textContent='A consultar…';await refresh(wrap);button.disabled=false;button.textContent=isGateway?'Verificar novamente':'Recarregar snapshot';});
     actions.append(button);
-    if(!isGateway){actions.append(link('Abrir Control Center privado ↗',CORE_LOGIN));}
+    if(!isGateway){actions.append(link('Abrir painel privado · GitHub ↗','https://nexo-owner-gateway-production.up.railway.app/'));actions.append(link('Abrir Control Center privado ↗',CORE_LOGIN));}
     const caption=el('div','nexo-ops-caption','');caption.id='nexo-ops-when';caption.textContent='A carregar…';
     const list=el('div','nexo-ops-grid');list.id='nexo-ops-services';list.setAttribute('aria-live','polite');
     const more=el('button','nexo-ops-more','Ver todos os serviços');more.type='button';more.hidden=true;more.addEventListener('click',()=>{more.hidden=true;list.replaceChildren();if(last)last.services.forEach(s=>addService(list,s));});
     const foot=el('p','nexo-ops-note',isGateway?'A leitura de endpoints internos não substitui verificações funcionais. As tarefas agendadas não são consideradas offline.':'O painel das missões, Chat, COMMS e Voice continua DEMONSTRATIVO nesta página. Não usa credenciais nem permite alterações reais.');
-    const notice=el('div','nexo-ops-foot',isGateway?'Os dados são tratados no gateway privado e não guardados na app.':'Para aceder a dados privados, usa o Control Center oficial. A integração autenticada nesta app exige o novo gateway.');
+    const notice=el('div','nexo-ops-foot',isGateway?'Os dados são tratados no gateway privado e não guardados na app.':'O painel privado usa login GitHub e consulta Railway só de leitura. Os dados privados ficam no gateway; esta página mantém a auditoria histórica.');
     wrap.append(top,actions,caption,list,more,foot,notice);return wrap;
   }
   function addService(grid,s){
