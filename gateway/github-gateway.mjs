@@ -177,9 +177,19 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
       return withHeaders(redirect('/',303,{'Set-Cookie':expiredCookie(name,secure)}),secure);
     }
     if(req.method==='GET'&&path==='/'){
-      const authenticated=session(req);let data=null;
-      if(authenticated){try{if(!statusInFlight)statusInFlight=status().finally(()=>{statusInFlight=null});data=await statusInFlight;}catch{}}
-      return withHeaders(content(dashboard(authenticated,data)),secure,'same-origin');
+      const authenticated=session(req);let data=null,deployments={state:'disconnected'};
+      if(authenticated){
+        const owner=SHA256(cookieValue(req,name));
+        await Promise.all([
+          (async()=>{try{if(!statusInFlight)statusInFlight=status().finally(()=>{statusInFlight=null});data=await statusInFlight;}catch{}})(),
+          (async()=>{try{
+            const result=await railwayOAuth.handle(new Request(originUrl+'/railway/api/deployments'),owner);
+            deployments=result.ok?{state:'connected',data:await result.json()}:{state:result.status===401?'disconnected':'unavailable'};
+          }catch{deployments={state:'unavailable'};}})()
+        ]);
+        if(!session(req))return withHeaders(content(dashboard(false)),secure,'same-origin');
+      }
+      return withHeaders(content(dashboard(authenticated,data,deployments)),secure,'same-origin');
     }
     if(req.method==='GET'&&path==='/api/status'){
       if(!session(req))return withHeaders(json({error:'Login required'},401),secure);
