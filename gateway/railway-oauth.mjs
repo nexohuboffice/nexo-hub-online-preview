@@ -1,4 +1,5 @@
 import {randomBytes,createHash,timingSafeEqual} from 'node:crypto';
+import {readDeployments,deploymentsPage} from './deployments.mjs';
 const ISSUER='https://backboard.railway.com';
 export const RAILWAY_SCOPE='openid project:viewer';
 const PROJECT='7636e62d-ae69-44eb-ad29-dca7069ac054';
@@ -21,12 +22,24 @@ export function createRailwayOAuth({origin,railwayClientId,railwayClientSecret},
  function page(owner){
   prune();const csrf=token();forms.set(owner,{csrf,until:now()+600000});
   const connected=grants.has(owner);
-  return new Response('<!doctype html><html lang="pt"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEXO · Ligação Railway</title><body style="background:#080d1d;color:#edf4ff;font:16px/1.6 system-ui;max-width:760px;margin:40px auto;padding:24px"><a style="color:#79e7f6" href="/">← Painel NEXO HUB</a><h1>Railway · Só de leitura</h1><p>'+(connected?'Ligação de leitura verificada para o projeto NEXO HUB. A integração dos estados de execução aguarda validação; os cartões atuais continuam a usar sondagens HTTP.':configured?'Aprova a consulta do projeto NEXO HUB no Railway.':'Preparação concluída. Falta configurar o identificador e segredo da aplicação OAuth no servidor.')+'</p><ul><li>Permissões pedidas: identidade técnica e visualização do projeto.</li><li>Seleciona apenas NEXO HUB. O Railway concede visualização ao projeto, não apenas a um serviço.</li><li>Sem permissões de edição, deploy, envio de mensagens ou acesso permanente.</li><li>O token fica apenas na memória do servidor, durante esta sessão, por até uma hora. Sair do NEXO ou reiniciar o gateway elimina a ligação.</li></ul>'+(configured?'<form method="POST" action="/railway/'+(connected?'disconnect':'connect')+'?csrf='+csrf+'"><button style="padding:14px;background:#79e7f6;border:0;border-radius:9px" type="submit">'+(connected?'Desligar Railway nesta sessão':'Rever e aprovar no Railway')+'</button></form>':'')+'<p>CORE, Discord e Gmail não são alterados.</p></body></html>',{headers:{'Content-Type':'text/html; charset=utf-8'}});
+  return new Response('<!doctype html><html lang="pt"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEXO · Ligação Railway</title><body style="background:#080d1d;color:#edf4ff;font:16px/1.6 system-ui;max-width:760px;margin:40px auto;padding:24px"><a style="color:#79e7f6" href="/">← Painel NEXO HUB</a><h1>Railway · Só de leitura</h1><p>'+(connected?'Ligação de leitura verificada para o projeto NEXO HUB. <a style="color:#79e7f6" href="/railway/deployments">Consultar deployments</a>. Os cartões de saúde continuam a usar sondagens HTTP.':configured?'Aprova a consulta do projeto NEXO HUB no Railway.':'Preparação concluída. Falta configurar o identificador e segredo da aplicação OAuth no servidor.')+'</p><ul><li>Permissões pedidas: identidade técnica e visualização do projeto.</li><li>Seleciona apenas NEXO HUB. O Railway concede visualização ao projeto, não apenas a um serviço.</li><li>Sem permissões de edição, deploy, envio de mensagens ou acesso permanente.</li><li>O token fica apenas na memória do servidor, durante esta sessão, por até uma hora. Sair do NEXO ou reiniciar o gateway elimina a ligação.</li></ul>'+(configured?'<form method="POST" action="/railway/'+(connected?'disconnect':'connect')+'?csrf='+csrf+'"><button style="padding:14px;background:#79e7f6;border:0;border-radius:9px" type="submit">'+(connected?'Desligar Railway nesta sessão':'Rever e aprovar no Railway')+'</button></form>':'')+'<p>CORE, Discord e Gmail não são alterados.</p></body></html>',{headers:{'Content-Type':'text/html; charset=utf-8'}});
  }
  async function handle(req,owner){
   prune();const url=new URL(req.url),path=url.pathname;
   if(!path.startsWith('/railway'))return null;
   if(!owner)return json('Login required',401);
+  if(req.method==='GET'&&['/railway/deployments','/railway/api/deployments'].includes(path)){
+   const grant=grants.get(owner);
+   if(!grant)return json('Railway connection required',401);
+   try{
+    if(!grant.cache||grant.cache.until<=now()){
+     if(!grant.inFlight)grant.inFlight=readDeployments(http,grant.accessToken,now).then(value=>({value,until:now()+20000})).finally(()=>{grant.inFlight=null;});
+     grant.cache=await grant.inFlight;
+    }
+    if(grants.get(owner)!==grant||grant.until<=now())return json('Railway connection expired',401);
+    return path==='/railway/api/deployments'?Response.json(grant.cache.value):new Response(deploymentsPage(grant.cache.value),{headers:{'Content-Type':'text/html; charset=utf-8'}});
+   }catch{grant.cache=null;return json('Read-only deployments unavailable',503);}
+  }
   if(req.method==='GET'&&path==='/railway')return page(owner);
   if(req.method==='POST'&&['/railway/connect','/railway/disconnect'].includes(path)){
    const form=forms.get(owner);

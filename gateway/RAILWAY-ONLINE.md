@@ -1,3 +1,29 @@
+# Current status — 17 November 2026
+
+The existing gateway is deployed at https://nexo-owner-gateway-production.up.railway.app, pinned to ea592d4e651bcc9831e8d20d18cf1c5562e43984. Real owner GitHub login, eight private health responses and logout protection were verified on 17 November. It monitors twelve services; Railway has thirteen including the gateway. The older setup proposal below is historical, not the current deployment state.
+
+## Deployment reader candidate
+
+The existing Railway OAuth preparation now exposes GET /railway/deployments (HTML) and GET /railway/api/deployments (JSON) after both GitHub login and a session-bound Railway viewer grant. This candidate is not deployed or validated with a real Railway OAuth grant.
+
+- Fixed GraphQL query for the NEXO production environment, with project/environment response validation and bounded response size. No mutations, variables, logs or deployment actions.
+- Returns service name, latest deployment state and creation time only, including the gateway. SUCCESS is not a workload-health or cron-freshness assertion.
+- Cache and concurrent requests are scoped to the grant, maximum 20 seconds. Expiry/disconnect/logout reject in-flight results; stale data is not returned after provider errors.
+- Existing health dashboard, public Pages and Voice Demo are unchanged.
+- Verified against public Railway schema introspection: Environment.projectId, serviceInstances(first), ServiceInstance.latestDeployment, and DeploymentStatus enum. Actual viewer permission behavior still requires the real OAuth test.
+
+## Remaining activation steps
+
+1. Reuse an existing suitable Railway OAuth web app if present; otherwise register one in the workspace Developer settings. Exact redirect: https://nexo-owner-gateway-production.up.railway.app/railway/callback
+2. Configure NEXO_RAILWAY_OAUTH_CLIENT_ID and NEXO_RAILWAY_OAUTH_CLIENT_SECRET privately on the existing gateway. Never paste secrets into chat or repository files. Neither variable is present in the audited service configuration.
+3. After CI passes, deploy the exact reviewed commit only on the existing gateway, retaining limits and one replica. No new service, volume or paid feature.
+4. Owner signs in with GitHub, opens /railway, and grants only openid project:viewer for NEXO HUB. No workspace/editor/offline scopes. This is a new access grant requiring explicit consent.
+5. Verify the HTML and JSON show the same inventory as the Railway connector, then test disconnect and logout denial. Do not declare this integration complete before these live tests pass.
+
+Sources: https://docs.railway.com/integrations/oauth/creating-an-app and https://docs.railway.com/integrations/oauth/scopes-and-user-consent
+
+---
+## Historical deployment proposal (superseded by current status above)
 # NEXO online gateway candidate — 14 November 2026
 
 This branch prepares an online trial. Do not merge to main or accept deployment yet.
