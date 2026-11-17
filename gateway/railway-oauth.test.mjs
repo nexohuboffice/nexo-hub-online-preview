@@ -21,7 +21,7 @@ function setup(options={}){
   const html=await(await page()).text();const csrf=html.match(/csrf=([a-f0-9]{64})/)[1];
   return oauth.handle(req(path+'?csrf='+csrf,'POST',{Origin:origin}),owner);
  }
- async function start(){const response=await form();const u=new URL(response.headers.get('location'));return {response,u,state:u.searchParams.get('state')};}
+ async function start(){const response=await form();assert.equal(response.status,200);assert.equal(response.headers.get('location'),null);const html=await response.text();const u=new URL(html.match(/href="(https:\/\/backboard\.railway\.com[^\"]+)"/)[1].replaceAll('&amp;','&'));return {response,u,state:u.searchParams.get('state')};}
  const finish=(state,who=owner,issuer='https://backboard.railway.com')=>oauth.handle(req('/railway/callback?code=CODE&state='+state+'&iss='+encodeURIComponent(issuer)),who);
  return {oauth,req,page,form,start,finish,calls,advance:ms=>now+=ms};
 }

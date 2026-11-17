@@ -55,7 +55,10 @@ export function createRailwayOAuth({origin,railwayClientId,railwayClientSecret},
    active.set(owner,{key:hash(state),until:now()+600000});
    const target=new URL(ISSUER+'/oauth/auth');
    for(const [k,v] of Object.entries({client_id:railwayClientId,response_type:'code',redirect_uri:callback,scope:RAILWAY_SCOPE,prompt:'consent',state,code_challenge:createHash('sha256').update(verifier).digest('base64url'),code_challenge_method:'S256'}))target.searchParams.set(k,v);
-   return new Response(null,{status:303,headers:{Location:target.href}});
+   // A form-action 'self' policy can block cross-origin redirects after POST.
+   // Keep that policy: use an explicit GET navigation instead of widening it.
+   const href=target.href.replaceAll('&','&amp;').replaceAll('"','&quot;');
+   return new Response('<!doctype html><html lang="pt"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEXO · Autorizar leitura</title><body style="background:#080d1d;color:#edf4ff;font:16px/1.6 system-ui;max-width:760px;margin:40px auto;padding:24px"><h1>Continuar no Railway</h1><p>Na página seguinte, seleciona apenas NEXO HUB e confirma a permissão de visualização.</p><a style="display:inline-block;padding:14px;background:#79e7f6;color:#092133;border-radius:9px" href="'+href+'" rel="noreferrer">Abrir consentimento Railway</a><p><a style="color:#79e7f6" href="/railway">Cancelar</a></p></body></html>',{headers:{'Content-Type':'text/html; charset=utf-8'}});
   }
   if(req.method==='GET'&&path==='/railway/callback'){
    const state=url.searchParams.get('state');
