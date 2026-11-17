@@ -5,6 +5,46 @@ import {onlineConfig,onlineServer} from './online-server.mjs';
 import {createGitHubGateway} from './github-gateway.mjs';
 import {dashboard} from './dashboard.mjs';
 import {DEPLOYMENTS_QUERY} from './deployments.mjs';
+import {createPrivateChat} from './chat.mjs';
+
+test('private chat binds one-use forms to sessions, escapes text and never needs a provider',async()=>{
+ let now=0;const chat=createPrivateChat({now:()=>now}),origin='https://gateway.example.org';
+ const req=(body,extra={})=>new Request(origin+'/chat',{method:'POST',headers:{Origin:origin,'Content-Type':'application/x-www-form-urlencoded',...extra},body});
+ const form=async owner=>(await(await chat.handle(new Request(origin+'/chat'),owner,()=>true)).text()).match(/name="csrf" value="([a-f0-9]+)"/)[1];
+ assert.equal((await chat.handle(new Request(origin+'/chat'),null,()=>false)).status,401);
+ const token=await form('one');const body=new URLSearchParams({csrf:token,message:'<script>alert(1)</script>',scenario:'reply'}).toString();
+ assert.equal((await chat.handle(req(body),'two',()=>true)).status,403);
+ assert.equal((await chat.handle(req(body,{Origin:'https://evil.example'}),'one',()=>true)).status,403);
+ const r=await chat.handle(req(body),'one',()=>true);assert.equal(r.status,200);const html=await r.text();assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);assert.match(html,/resposta é fixa/);
+ assert.equal((await chat.handle(req(body),'one',()=>true)).status,403);
+ const expired=await form('one');now+=600001;assert.equal((await chat.handle(req(new URLSearchParams({csrf:expired,message:'test',scenario:'reply'})),'one',()=>true)).status,403);
+ for(const [message,scenario,status] of [['','reply',400],['x'.repeat(1001),'reply',400],['test','error',503],['test','execute',400]]){
+  const csrf=await form('one');const result=await chat.handle(req(new URLSearchParams({csrf,message,scenario})),'one',()=>true);assert.equal(result.status,status);
+ }
+ const csrf=await form('one');chat.forget('one');assert.equal((await chat.handle(req(new URLSearchParams({csrf,message:'test',scenario:'reply'})),'one',()=>true)).status,403);
+ assert.equal((await chat.handle(req('message=test'),'one',()=>false)).status,401);
+ assert.equal((await chat.handle(req('x'.repeat(16385)),'one',()=>true)).status,413);
+});
+
+test('HTTP chat accepts bounded authenticated forms only; logout removes access',async t=>{
+ let calls=0;const server=onlineServer(onlineConfig(env),{http:async url=>{calls++;return Response.json(url.includes('/access_token')?{access_token:'mock',scope:''}:{id:353932686});}});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
+ let cookie='';
+ const send=(path,body,extra={})=>new Promise((resolve,reject)=>{
+  const headers={Host:'gateway.example.org',Cookie:cookie,Origin:env.GATEWAY_ORIGIN,...(body!==undefined?{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(body)}:{}),...extra};
+  const q=request({host:'127.0.0.1',port:server.address().port,path,method:body!==undefined?'POST':'GET',headers},r=>{let text='';r.on('data',c=>text+=c);r.on('end',()=>resolve({status:r.statusCode,headers:r.headers,text}));});q.on('error',reject);q.end(body);
+ });
+ assert.equal((await send('/chat')).status,401);
+ const login=await send('/auth/login');cookie=login.headers['set-cookie'][0].split(';')[0];
+ const state=new URL(login.headers.location).searchParams.get('state');const cb=await send('/auth/callback?code=mock&state='+state);cookie=cb.headers['set-cookie'].find(c=>c.startsWith('__Host-nexo_sid=')).split(';')[0];
+ const page=await send('/chat');assert.equal(page.status,200);assert.match(page.headers['content-security-policy'],/default-src 'none'/);
+ const csrf=page.text.match(/name="csrf" value="([a-f0-9]+)"/)[1],body=new URLSearchParams({csrf,message:'Teste privado',scenario:'reply'}).toString();
+ assert.equal((await send('/chat',body)).status,200);assert.equal(calls,2);
+ assert.equal((await send('/chat','x'.repeat(16385))).status,413);
+ assert.equal((await send('/chat',body,{Origin:'https://evil.example'})).status,403);
+ assert.equal((await send('/api/status','message=test')).status,413);
+ await send('/auth/logout','');assert.equal((await send('/chat')).status,401);assert.equal((await send('/chat',body)).status,401);
+});
 const env={GATEWAY_ORIGIN:'https://gateway.example.org',GITHUB_OAUTH_CLIENT_ID:'mock',
  GITHUB_OAUTH_CLIENT_SECRET:'mock-only',GITHUB_OWNER_ID:'353932686',
  RAILWAY_PROJECT_ID:'7636e62d-ae69-44eb-ad29-dca7069ac054',

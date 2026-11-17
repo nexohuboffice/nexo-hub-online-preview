@@ -38,10 +38,19 @@ export function onlineServer(config,injected){
          req.url.startsWith('//')||req.url.includes('\\')||req.url.length>4096){
         res.writeHead(400,{'Cache-Control':'no-store'});res.end();return;
       }
-      if(req.headers['transfer-encoding']||Number(req.headers['content-length']||0)>0){
+      const chatBody=req.method==='POST'&&req.url==='/chat';
+      if(!chatBody&&(req.headers['transfer-encoding']||Number(req.headers['content-length']||0)>0)){
         res.writeHead(413,{'Connection':'close','Cache-Control':'no-store'});res.end();return;
       }
-      const request=new Request(config.origin+req.url,{method:req.method,headers:req.headers});
+      let body;
+      if(chatBody){
+        if(req.headers.origin!==config.origin){res.writeHead(403,{'Cache-Control':'no-store'});res.end();return;}
+        if(Number(req.headers['content-length']||0)>16384){res.writeHead(413,{'Connection':'close','Cache-Control':'no-store'});res.end();return;}
+        let size=0;const chunks=[];
+        for await(const chunk of req){size+=chunk.length;if(size>16384){res.writeHead(413,{'Connection':'close','Cache-Control':'no-store'});res.end();return;}chunks.push(chunk);}
+        body=Buffer.concat(chunks);
+      }
+      const request=new Request(config.origin+req.url,{method:req.method,headers:req.headers,...(chatBody?{body}:{} )});
       const response=await gateway.handle(request);
       const headers=Object.fromEntries(response.headers.entries());
       const cookies=response.headers.getSetCookie();

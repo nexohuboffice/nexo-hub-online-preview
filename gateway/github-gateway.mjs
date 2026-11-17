@@ -4,6 +4,7 @@
  */
 import {createRailwayOAuth} from './railway-oauth.mjs';
 import {dashboard} from './dashboard.mjs';
+import {createPrivateChat} from './chat.mjs';
 import { createServer } from 'node:http';
 import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 
@@ -64,6 +65,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   const stateName=secure?'__Host-nexo_oauth':'nexo_local_oauth';
   const states=new Map(),sessions=new Map();
   const railwayOAuth=createRailwayOAuth(config,{http,now});
+  const privateChat=createPrivateChat({now});
   let cache={until:0,value:null}, statusInFlight=null;
   let loginWindow={until:0,count:0}, callbackWindow={until:0,count:0};
   function allowAuth(kind){
@@ -73,9 +75,9 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
   }
   function prune(){
     for(const [key,val] of states)if(val<=now())states.delete(key);
-    for(const [key,val] of sessions)if(val.expires<=now()){sessions.delete(key);railwayOAuth.forget(key);}
+    for(const [key,val] of sessions)if(val.expires<=now()){sessions.delete(key);railwayOAuth.forget(key);privateChat.forget(key);}
     while(states.size>100)states.delete(states.keys().next().value);
-    while(sessions.size>100){const key=sessions.keys().next().value;sessions.delete(key);railwayOAuth.forget(key);}
+    while(sessions.size>100){const key=sessions.keys().next().value;sessions.delete(key);railwayOAuth.forget(key);privateChat.forget(key);}
   }
   function session(req){prune();const raw=cookieValue(req,name);if(!HEX_64.test(raw))return false;const s=sessions.get(SHA256(raw));return !!s&&s.expires>now()&&s.userId===String(ownerGitHubId);}
   async function githubProfile(code){
@@ -140,6 +142,10 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     if(url.origin!==originUrl || (suppliedHost && suppliedHost.toLowerCase()!==parsed.host.toLowerCase()))
       return withHeaders(json({error:'Host not allowed'},421),secure);
     const path=url.pathname;prune();
+    if(path==='/chat'){
+      const owner=session(req)?SHA256(cookieValue(req,name)):null;
+      return withHeaders(await privateChat.handle(req,owner,()=>session(req)),secure);
+    }
     if(path==='/railway'||path.startsWith('/railway/')){
       const owner=session(req)?SHA256(cookieValue(req,name)):null;
       const result=await railwayOAuth.handle(req,owner);
@@ -173,7 +179,7 @@ export function createGitHubGateway(config,{http=fetch,now=()=>Date.now(),nonce=
     if(req.method==='GET'&&path==='/api/session')return withHeaders(json({authenticated:session(req),readOnly:true}),secure);
     if(req.method==='POST'&&path==='/auth/logout'){
       if(req.headers.get('origin')!==originUrl)return withHeaders(json({error:'Invalid origin'},403),secure);
-      const sid=cookieValue(req,name);if(HEX_64.test(sid)){sessions.delete(SHA256(sid));railwayOAuth.forget(SHA256(sid));}
+      const sid=cookieValue(req,name);if(HEX_64.test(sid)){sessions.delete(SHA256(sid));railwayOAuth.forget(SHA256(sid));privateChat.forget(SHA256(sid));}
       return withHeaders(redirect('/',303,{'Set-Cookie':expiredCookie(name,secure)}),secure);
     }
     if(req.method==='GET'&&path==='/'){
