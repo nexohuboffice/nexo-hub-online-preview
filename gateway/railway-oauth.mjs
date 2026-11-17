@@ -73,9 +73,16 @@ export function createRailwayOAuth({origin,railwayClientId,railwayClientSecret},
    try{
     const response=await http(ISSUER+'/oauth/token',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{Accept:'application/json','Content-Type':'application/x-www-form-urlencoded',Authorization:'Basic '+Buffer.from(encodeURIComponent(railwayClientId)+':'+encodeURIComponent(railwayClientSecret)).toString('base64')},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:callback,code_verifier:flow.verifier}).toString()});
     if(!response.ok){diagnostic='TOKEN_EXCHANGE_REJECTED';throw Error();}diagnostic='TOKEN_RESPONSE_INVALID';const grant=await response.json();
-    const scopes=typeof grant.scope==='string'?grant.scope.split(/\s+/).filter(Boolean):[];
-    diagnostic='TOKEN_SCOPE_OR_FORMAT_REJECTED';
-    if(scopes.length!==2||!scopes.includes('openid')||!scopes.includes('project:viewer')||grant.refresh_token||String(grant.token_type).toLowerCase()!=='bearer'||typeof grant.access_token!=='string'||!grant.access_token||grant.access_token.length>16384||!Number.isFinite(grant.expires_in)||grant.expires_in<=0)throw Error();
+    if(!grant||typeof grant!=='object'||Array.isArray(grant))throw Error();
+    // RFC 6749 section 5.1: omitted scope means the requested scope is unchanged.
+    const scope=grant.scope===undefined?RAILWAY_SCOPE:grant.scope;
+    const scopes=typeof scope==='string'?scope.split(/\s+/).filter(Boolean):[];
+    diagnostic='TOKEN_SCOPE_REJECTED';
+    if(scopes.length!==2||!scopes.includes('openid')||!scopes.includes('project:viewer'))throw Error();
+    diagnostic='TOKEN_REFRESH_REJECTED';if(grant.refresh_token)throw Error();
+    diagnostic='TOKEN_TYPE_REJECTED';if(typeof grant.token_type!=='string'||grant.token_type.toLowerCase()!=='bearer')throw Error();
+    diagnostic='TOKEN_ACCESS_FORMAT_REJECTED';if(typeof grant.access_token!=='string'||!grant.access_token||grant.access_token.length>16384)throw Error();
+    diagnostic='TOKEN_EXPIRY_REJECTED';if(!Number.isFinite(grant.expires_in)||grant.expires_in<=0)throw Error();
     diagnostic='PROJECT_QUERY_UNAVAILABLE';
     const check=await http(ISSUER+'/graphql/v2',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{'Content-Type':'application/json',Accept:'application/json',Authorization:'Bearer '+grant.access_token},body:JSON.stringify({query:PROJECT_QUERY})});
     if(!check.ok){diagnostic='PROJECT_QUERY_REJECTED';throw Error();}diagnostic='PROJECT_RESPONSE_INVALID';const result=await check.json();

@@ -7,7 +7,7 @@ function setup(options={}){
  let now=100000,calls=[];
  const oauth=createRailwayOAuth({origin,railwayClientId:'client',railwayClientSecret:'PRIVATE_CLIENT'},{now:()=>now,http:async(url,init)=>{
   calls.push({url,init});
-  if(url.endsWith('/oauth/token')){if(options.tokenFailure)return new Response('PRIVATE_PROVIDER_ERROR',{status:401});return Response.json({access_token:'PRIVATE_ACCESS',token_type:'Bearer',scope:options.scope||'openid project:viewer',expires_in:3600});}
+  if(url.endsWith('/oauth/token')){if(options.tokenFailure)return new Response('PRIVATE_PROVIDER_ERROR',{status:401});return Response.json({access_token:'PRIVATE_ACCESS',token_type:'Bearer',scope:options.scope||'openid project:viewer',expires_in:3600,...options.grant});}
   if(JSON.parse(init.body).query===DEPLOYMENTS_QUERY){
    if(options.read)return options.read(oauth);
    return Response.json({data:{environment:{id:ENVIRONMENT,projectId:project,serviceInstances:{pageInfo:{hasNextPage:false},edges:[{node:{serviceName:'nexo-owner-gateway',latestDeployment:{status:'SUCCESS',createdAt:'2026-11-17T12:00:00Z',secret:'DO_NOT_RENDER'}}}]}}}});
@@ -31,9 +31,28 @@ test('Railway flow requires owner, form CSRF and exact origin',async()=>{
  assert.equal(m.calls.length,0);
 });
 test('callback diagnostics distinguish rejection stages without provider data or credentials',async()=>{
- for(const [options,diagnostic] of [[{tokenFailure:true},'TOKEN_EXCHANGE_REJECTED'],[{scope:'openid project:member'},'TOKEN_SCOPE_OR_FORMAT_REJECTED'],[{projects:['other']},'PROJECT_SELECTION_REJECTED'],[{beforeProject:oauth=>oauth.forget(owner)},'SESSION_ENDED']]){
+ for(const [options,diagnostic] of [[{tokenFailure:true},'TOKEN_EXCHANGE_REJECTED'],[{scope:'openid project:member'},'TOKEN_SCOPE_REJECTED'],[{projects:['other']},'PROJECT_SELECTION_REJECTED'],[{beforeProject:oauth=>oauth.forget(owner)},'SESSION_ENDED']]){
   const m=setup(options),{state}=await m.start(),r=await m.finish(state);
   assert.equal(r.status,403);const body=await r.text();assert.equal(JSON.parse(body).diagnostic,diagnostic);assert.doesNotMatch(body,/PRIVATE|CODE|Bearer|client_secret/);
+ }
+});
+test('omitted scope inherits only requested permissions and still checks project selection',async()=>{
+ const m=setup({grant:{scope:undefined}}),{state}=await m.start();
+ assert.equal((await m.finish(state)).status,303);
+ const wrong=setup({grant:{scope:undefined},projects:['other']}),flow=await wrong.start();
+ assert.equal((await wrong.finish(flow.state)).status,403);
+});
+test('invalid token fields fail closed with fixed safe diagnostics before project queries',async()=>{
+ for(const [grant,diagnostic] of [
+  [{scope:null},'TOKEN_SCOPE_REJECTED'],[{scope:''},'TOKEN_SCOPE_REJECTED'],
+  [{scope:'openid project:viewer project:member'},'TOKEN_SCOPE_REJECTED'],
+  [{refresh_token:'PRIVATE_REFRESH'},'TOKEN_REFRESH_REJECTED'],
+  [{token_type:'MAC'},'TOKEN_TYPE_REJECTED'],[{access_token:''},'TOKEN_ACCESS_FORMAT_REJECTED'],
+  [{expires_in:'3600'},'TOKEN_EXPIRY_REJECTED'],[{expires_in:0},'TOKEN_EXPIRY_REJECTED']]){
+  const m=setup({grant}),{state}=await m.start(),r=await m.finish(state);
+  assert.equal(r.status,403);assert.deepEqual(await r.json(),{error:'Railway connection could not be verified',diagnostic});
+  assert.equal(m.calls.length,1);
+  assert.equal((await m.oauth.handle(m.req('/railway/api/deployments'),owner)).status,401);
  }
 });
 test('deployments require Railway grant, use fixed read query and sanitize/cache per session',async()=>{
