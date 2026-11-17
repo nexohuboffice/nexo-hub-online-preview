@@ -7,7 +7,7 @@ function setup(options={}){
  let now=100000,calls=[];
  const oauth=createRailwayOAuth({origin,railwayClientId:'client',railwayClientSecret:'PRIVATE_CLIENT'},{now:()=>now,http:async(url,init)=>{
   calls.push({url,init});
-  if(url.endsWith('/oauth/token'))return Response.json({access_token:'PRIVATE_ACCESS',token_type:'Bearer',scope:options.scope||'openid project:viewer',expires_in:3600});
+  if(url.endsWith('/oauth/token')){if(options.tokenFailure)return new Response('PRIVATE_PROVIDER_ERROR',{status:401});return Response.json({access_token:'PRIVATE_ACCESS',token_type:'Bearer',scope:options.scope||'openid project:viewer',expires_in:3600});}
   if(JSON.parse(init.body).query===DEPLOYMENTS_QUERY){
    if(options.read)return options.read(oauth);
    return Response.json({data:{environment:{id:ENVIRONMENT,projectId:project,serviceInstances:{pageInfo:{hasNextPage:false},edges:[{node:{serviceName:'nexo-owner-gateway',latestDeployment:{status:'SUCCESS',createdAt:'2026-11-17T12:00:00Z',secret:'DO_NOT_RENDER'}}}]}}}});
@@ -29,6 +29,12 @@ test('Railway flow requires owner, form CSRF and exact origin',async()=>{
  const m=setup();assert.equal((await m.oauth.handle(m.req('/railway'),null)).status,401);
  assert.equal((await m.oauth.handle(m.req('/railway/connect','POST',{Origin:origin}),owner)).status,403);
  assert.equal(m.calls.length,0);
+});
+test('callback diagnostics distinguish rejection stages without provider data or credentials',async()=>{
+ for(const [options,diagnostic] of [[{tokenFailure:true},'TOKEN_EXCHANGE_REJECTED'],[{scope:'openid project:member'},'TOKEN_SCOPE_OR_FORMAT_REJECTED'],[{projects:['other']},'PROJECT_SELECTION_REJECTED'],[{beforeProject:oauth=>oauth.forget(owner)},'SESSION_ENDED']]){
+  const m=setup(options),{state}=await m.start(),r=await m.finish(state);
+  assert.equal(r.status,403);const body=await r.text();assert.equal(JSON.parse(body).diagnostic,diagnostic);assert.doesNotMatch(body,/PRIVATE|CODE|Bearer|client_secret/);
+ }
 });
 test('deployments require Railway grant, use fixed read query and sanitize/cache per session',async()=>{
  const m=setup(),path='/railway/api/deployments';

@@ -69,22 +69,27 @@ export function createRailwayOAuth({origin,railwayClientId,railwayClientSecret},
    if(url.searchParams.get('error'))return json('Railway access was not approved',403);
    if(url.searchParams.get('iss')!==ISSUER)return json('Unexpected Railway issuer',403);
    const code=url.searchParams.get('code');if(!code||code.length>2048)return json('Invalid Railway code',400);
+   let diagnostic='TOKEN_EXCHANGE_UNAVAILABLE';
    try{
     const response=await http(ISSUER+'/oauth/token',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{Accept:'application/json','Content-Type':'application/x-www-form-urlencoded',Authorization:'Basic '+Buffer.from(encodeURIComponent(railwayClientId)+':'+encodeURIComponent(railwayClientSecret)).toString('base64')},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:callback,code_verifier:flow.verifier}).toString()});
-    if(!response.ok)throw Error();const grant=await response.json();
+    if(!response.ok){diagnostic='TOKEN_EXCHANGE_REJECTED';throw Error();}diagnostic='TOKEN_RESPONSE_INVALID';const grant=await response.json();
     const scopes=typeof grant.scope==='string'?grant.scope.split(/\s+/).filter(Boolean):[];
+    diagnostic='TOKEN_SCOPE_OR_FORMAT_REJECTED';
     if(scopes.length!==2||!scopes.includes('openid')||!scopes.includes('project:viewer')||grant.refresh_token||String(grant.token_type).toLowerCase()!=='bearer'||typeof grant.access_token!=='string'||!grant.access_token||grant.access_token.length>16384||!Number.isFinite(grant.expires_in)||grant.expires_in<=0)throw Error();
+    diagnostic='PROJECT_QUERY_UNAVAILABLE';
     const check=await http(ISSUER+'/graphql/v2',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{'Content-Type':'application/json',Accept:'application/json',Authorization:'Bearer '+grant.access_token},body:JSON.stringify({query:PROJECT_QUERY})});
-    if(!check.ok)throw Error();const result=await check.json();
+    if(!check.ok){diagnostic='PROJECT_QUERY_REJECTED';throw Error();}diagnostic='PROJECT_RESPONSE_INVALID';const result=await check.json();
     const workspaces=result.data?.externalWorkspaces;if(result.errors?.length||!Array.isArray(workspaces))throw Error();
     const ids=workspaces.flatMap(w=>Array.isArray(w.projects)?w.projects.map(p=>p.id):['invalid']);
+    diagnostic='PROJECT_SELECTION_REJECTED';
     if(ids.length!==1||ids[0]!==PROJECT)throw Error();
     // Logout/disconnect may happen while the provider request is in flight.
+    diagnostic='SESSION_ENDED';
     if(active.get(owner)?.key!==hash(state))throw Error();
     active.delete(owner);
     grants.set(owner,{accessToken:grant.access_token,until:now()+Math.min(grant.expires_in,3600)*1000});
     return redirect();
-   }catch{return json('Railway connection refused: check read-only permission and select only NEXO HUB',403);}
+   }catch{return Response.json({error:'Railway connection could not be verified',diagnostic},{status:403});}
   }
   return json('Not found or method not allowed',404);
  }
