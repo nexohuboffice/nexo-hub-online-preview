@@ -46,7 +46,6 @@ test('invalid token fields fail closed with fixed safe diagnostics before projec
  for(const [grant,diagnostic] of [
   [{scope:null},'TOKEN_SCOPE_REJECTED'],[{scope:''},'TOKEN_SCOPE_REJECTED'],
   [{scope:'openid project:viewer project:member'},'TOKEN_SCOPE_REJECTED'],
-  [{refresh_token:'PRIVATE_REFRESH'},'TOKEN_REFRESH_REJECTED'],
   [{token_type:'MAC'},'TOKEN_TYPE_REJECTED'],[{access_token:''},'TOKEN_ACCESS_FORMAT_REJECTED'],
   [{expires_in:'3600'},'TOKEN_EXPIRY_REJECTED'],[{expires_in:0},'TOKEN_EXPIRY_REJECTED']]){
   const m=setup({grant}),{state}=await m.start(),r=await m.finish(state);
@@ -54,6 +53,18 @@ test('invalid token fields fail closed with fixed safe diagnostics before projec
   assert.equal(m.calls.length,1);
   assert.equal((await m.oauth.handle(m.req('/railway/api/deployments'),owner)).status,401);
  }
+});
+test('unsolicited refresh token is discarded without renewal or extending session lifetime',async()=>{
+ const m=setup({grant:{refresh_token:'PRIVATE_REFRESH',expires_in:7200}}),{state,u}=await m.start();
+ assert.equal(u.searchParams.get('scope'),'openid project:viewer');
+ assert.equal((await m.finish(state)).status,303);
+ const path='/railway/api/deployments';
+ const result=await m.oauth.handle(m.req(path),owner);assert.equal(result.status,200);
+ assert.doesNotMatch(await result.text(),/PRIVATE/);
+ assert.doesNotMatch(JSON.stringify(m.calls),/PRIVATE_REFRESH|refresh_token/);
+ const count=m.calls.length;m.advance(3600001);
+ assert.equal((await m.oauth.handle(m.req(path),owner)).status,401);
+ assert.equal(m.calls.length,count);
 });
 test('deployments require Railway grant, use fixed read query and sanitize/cache per session',async()=>{
  const m=setup(),path='/railway/api/deployments';
