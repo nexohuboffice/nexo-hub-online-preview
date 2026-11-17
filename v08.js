@@ -38,7 +38,7 @@
     left.append(el('span','nexo-ops-kicker','NEXO HUB / OPERAÇÕES · v0.8'));
     const h=el('h2','',isGateway?'Centro de estado — privado':'Estado dos serviços · acesso privado');h.id='nexo-ops-title';left.append(h);
     left.append(el('p','',isGateway?'Consulta autenticada do estado dos serviços. Nenhuma ação é executada.':'Entra com GitHub para consultar o estado atual. Os cartões abaixo são apenas a auditoria histórica.'));
-    top.append(left,el('span','nexo-ops-chip',isGateway?'🔐 ACESSO AUTENTICADO':'◷ SNAPSHOT VERIFICADO'));
+    top.append(left,el('span','nexo-ops-chip',isGateway?'🔐 ACESSO AUTENTICADO':'◷ AUDITORIA HISTÓRICA · SEM TEMPO REAL'));
     const actions=el('div','nexo-ops-actions');const button=el('button','',isGateway?'Atualizar verificação':'Recarregar snapshot');button.type='button';button.disabled=false;button.addEventListener('click',async()=>{button.disabled=true;button.textContent='A consultar…';await refresh(wrap);button.disabled=false;button.textContent=isGateway?'Verificar novamente':'Recarregar snapshot';});
     actions.append(button);
     if(!isGateway){const login=link('Entrar com GitHub · estado real',GATEWAY);login.target='_self';actions.prepend(login);}
@@ -52,6 +52,7 @@
   function addService(grid,s){
     const tile=el('div','nexo-ops-service');const title=el('strong','',s.id);const small=el('small','');const dot=el('i','nexo-ops-dot');
     let text='Online';if(s.state==='last_succeeded'){text='Última execução concluída';dot.classList.add('pending')}else if(s.state==='unreachable'){text='Sem resposta à sondagem';dot.classList.add('problem')}else if(s.state==='not_monitored'){text=s.id==='immo-discord-bootstrap'?'Provisionador — não sondado':'Tarefa agendada — não sondada';dot.classList.add('pending')}
+    if(!isGateway){text='Na auditoria: '+text.toLowerCase();dot.classList.add('pending');}
     small.append(dot,document.createTextNode(text));tile.append(title,small);grid.append(tile);
   }
   async function refresh(panel){
@@ -59,7 +60,7 @@
     try{const data=await getData();last=data;grid.replaceChildren();data.services.slice(0,6).forEach(s=>addService(grid,s));more.hidden=data.services.length<=6;more.textContent='Ver os '+data.services.length+' serviços';
       const checked=data.checkedAt||data.generatedAt;
       caption.textContent=isGateway?'Verificação do gateway: '+formatDate(checked)+' · '+data.services.length+' serviços':'Última auditoria: '+formatDate(checked)+' · '+data.services.length+' serviços';
-    }catch(err){grid.replaceChildren(el('p','',err.message||'Erro ao obter estado'));caption.textContent='Não foi possível atualizar';}
+    }catch(err){last=null;more.hidden=true;grid.replaceChildren(el('p','',err.message||'Erro ao obter estado'));caption.textContent='Não foi possível atualizar';}
   }
   function install(){
     const view=$('#view');if(!view||document.body.dataset.page!=='Dashboard')return;
