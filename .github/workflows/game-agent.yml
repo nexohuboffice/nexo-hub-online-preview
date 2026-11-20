@@ -1,0 +1,30 @@
+name: NEXO Game Agent checks
+on:
+  push:
+    paths:
+      - 'game-agent/**'
+      - 'v08.js'
+      - '.github/workflows/game-agent.yml'
+  pull_request:
+    paths:
+      - 'game-agent/**'
+      - 'v08.js'
+      - '.github/workflows/game-agent.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Accounting and puzzle tests
+        run: node --test game-agent/core.test.mjs
+      - name: JavaScript syntax validation
+        run: |
+          node --check game-agent/core.mjs
+          node --check game-agent/app.mjs
+          node --check v08.js
