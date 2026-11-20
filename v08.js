@@ -73,5 +73,16 @@
   const view=$('#view');if(view)watcher.observe(view,{childList:true});
   const header=$('main header .row');
   if(header&&!$('#nexo-ops-open')){const btn=el('a','nexo-ops-shortcut');btn.id='nexo-ops-open';btn.href=GATEWAY;btn.rel='noreferrer';btn.title='Entrar com GitHub e ver estado real';btn.setAttribute('aria-label','Entrar com GitHub e ver estado real');const dot=el('span','nexo-ops-indicator');btn.append(dot,el('span','','NEXO · Estado real'));const voice=$('#nexo-voice-open');voice?.before(btn);}
+  // Public navigation entry for the isolated Game Agent demo. No private data.
+  if(!isGateway){
+    const gameHeader=$('main header .row');
+    if(gameHeader&&!$('#nexo-game-open')){
+      const game=el('a','nexo-ops-shortcut','✦ Game Agent · Demo');
+      game.id='nexo-game-open';game.href='./game-agent/';game.target='_self';
+      game.title='Abrir protótipo público sem dados reais';
+      const voice=$('#nexo-voice-open');
+      if(voice)voice.before(game);else gameHeader.append(game);
+    }
+  }
   install();window.NexoOps={mode:isGateway?'authenticated-read-only':'public-snapshot',refresh:()=>{const panel=$('#nexo-ops-panel');if(panel)return refresh(panel);}};
 })();
