@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07101d">
+  <meta name="description" content="NEXO Game Agent v0.1 — demonstração do centro financeiro e de um agente de jogo autónomo em ambiente de teste.">
+  <title>NEXO Game Agent · Financial Center (DEMO)</title>
+  <link rel="icon" href="../icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <aside class="sidebar" aria-label="Navegação">
+    <a href="../" class="brand" aria-label="Voltar ao NEXO HUB"><span class="logo">✦</span><span><strong>NEXO HUB</strong><small>GAME AGENT · v0.1</small></span></a>
+    <p class="side-label">Control Center</p>
+    <nav class="side-nav">
+      <a class="active" href="#overview"><span class="sym">◈</span>Visão geral</a>
+      <a href="#financial"><span class="sym">▥</span>Centro financeiro</a>
+      <a href="#agent"><span class="sym">◇</span>Simulador</a>
+      <a href="#ledger"><span class="sym">☷</span>Histórico</a>
+      <a href="../"><span class="sym">↗</span>Voltar ao NEXO HUB</a>
+    </nav>
+    <div class="side-bottom">
+      <span class="dot"></span><strong>Ambiente de demonstração</strong>
+      <p>Sem Android cloud, sem anúncios e sem dados financeiros reais. Esta página não executa tarefas em segundo plano.</p>
+    </div>
+  </aside>
+  <main id="overview">
+    <header class="topbar">
+      <div class="crumb">NEXO HUB / <b>Game Agent</b> / Financial Center</div>
+      <div class="top-actions">
+        <span class="chip warn"><span class="dot"></span>PREVIEW PÚBLICA · FICTÍCIA</span>
+        <a class="app-link" href="https://nexo-owner-gateway-production.up.railway.app/">Portal privado ↗</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">AUTONOMOUS GAME LAB / V0.1</div>
+        <h1>Um agente independente.<br>Uma visão de todos os resultados.</h1>
+        <p>Primeiro protótipo do NEXO Game Agent: indicadores financeiros demonstrativos, monitor de decisões e um puzzle resolvido automaticamente por um algoritmo de procura de caminhos.</p>
+        <div class="hero-actions">
+          <button class="btn primary" id="start-main" type="button">▶ Iniciar agente de teste</button>
+          <a class="btn ghost" href="#financial">Ver Financial Center ↓</a>
+        </div>
+      </div>
+      <div class="hero-seal" aria-hidden="true">✦</div>
+    </section>
+
+    <div class="notice" role="status">⚠ <span><strong>DEMONSTRAÇÃO, não faturação real.</strong> Todos os montantes e moedas nesta página são exemplos fictícios. O jogo funciona apenas enquanto esta página está aberta. Não existe ligação à BestPlay, a anúncios, a pagamentos nem ao Android Cloud.</span></div>
+
+    <section id="financial" aria-labelledby="financial-title">
+      <div class="section-heading">
+        <div><h2 id="financial-title">Financial Center</h2><p>Os pagamentos confirmados contam como receita; moedas e ganhos pendentes ficam separados.</p></div>
+        <button class="btn" id="toggle-demo" type="button">Limpar dados de exemplo</button>
+      </div>
+      <div class="stat-grid">
+        <article class="stat"><div class="label">Receita confirmada <span class="ico" aria-hidden="true">↗</span></div><strong id="revenue">—</strong><small>Pagamentos fictícios concluídos</small></article>
+        <article class="stat"><div class="label">Custos operacionais <span class="ico" aria-hidden="true">▤</span></div><strong id="costs">—</strong><small>Infraestrutura + APIs · exemplo</small></article>
+        <article class="stat"><div class="label">Lucro líquido <span class="ico" aria-hidden="true">◉</span></div><strong id="profit">—</strong><small>Receita confirmada − despesas</small></article>
+        <article class="stat"><div class="label">Moedas registadas <span class="ico" aria-hidden="true">✧</span></div><strong id="coins">—</strong><small>Saldo virtual de exemplo, não euros</small></article>
+      </div>
+      <div class="section-heading"><div><h2>Resultados e objetivos</h2><p>Visualização calculada exclusivamente a partir do livro de eventos fictício.</p></div><span class="chip">EXEMPLO · SEM API</span></div>
+      <div class="panels">
+        <article class="card" aria-labelledby="chart-title">
+          <div class="card-top"><div><h3 id="chart-title">Receitas confirmadas</h3><p class="sub">Últimos 7 dias · EUR · dados de demonstração</p></div><span class="legend">Pagamentos confirmados</span></div>
+          <div class="bars" id="revenue-chart" role="img" aria-label="Gráfico de receitas diárias de demonstração"></div>
+          <div class="chart-note">Moedas e recompensas pendentes nunca são convertidas automaticamente em receitas.</div>
+        </article>
+        <article class="card" aria-labelledby="goal-title">
+          <div class="card-top"><div><h3 id="goal-title">Objetivo mensal</h3><p class="sub">Exercício de cálculo, não uma previsão de ganhos</p></div><span class="pill">DEMO</span></div>
+          <div class="goal-input"><label for="monthly-goal">Meta de receita (€)</label><input id="monthly-goal" type="number" min="1" max="100000" step="1" value="100"></div>
+          <div class="split"><strong id="goal-current">—</strong><span id="goal-percent">—</span></div>
+          <div class="progress" role="progressbar" aria-label="Progresso do objetivo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="goal-progress"><div class="fill" id="goal-fill" style="width:0%"></div></div>
+          <div class="separator"></div>
+          <div class="metric-inline"><span>Pagamentos por confirmar</span><strong id="pending">—</strong></div>
+          <div class="metric-inline"><span>Agente ligado à cloud</span><strong>Não</strong></div>
+          <div class="metric-inline"><span>Dados reais sincronizados</span><strong>Não</strong></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="agent" aria-labelledby="agent-title">
+      <div class="section-heading"><div><h2 id="agent-title">Agent Monitor</h2><p>Teste autónomo num puzzle local. Sem ligação a jogos comerciais.</p></div><span class="chip" id="agent-chip"><span class="dot"></span>PAUSADO · SIMULADOR</span></div>
+      <div class="panels">
+        <article class="card">
+          <div class="card-top"><div><h3>Ambiente de teste 6 × 6</h3><p class="sub">A IA de regras encontra o caminho mais curto até ao objetivo verde.</p></div><span class="pill">PUZZLE LAB</span></div>
+          <div class="game-stats">
+            <div><strong id="levels">0</strong><span>Níveis concluídos</span></div>
+            <div><strong id="moves">0</strong><span>Movimentos</span></div>
+            <div><strong id="runtime">0s</strong><span>Atividade nesta página</span></div>
+          </div>
+          <div class="play-grid" id="play-grid" role="img" aria-label="Mapa de teste do agente, com obstáculos e objetivo"></div>
+          <div class="split"><span>✦ Agente</span><span>◆ Objetivo</span><span>■ Obstáculo</span></div>
+          <div class="play-actions">
+            <button class="btn primary" type="button" id="toggle-agent">▶ Iniciar simulação</button>
+            <button class="btn" type="button" id="step-agent">Um passo</button>
+            <button class="btn ghost" type="button" id="reset-agent">Repor</button>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-top"><div><h3>Decisões do agente</h3><p class="sub">Observa → planeia → age → confirma o resultado</p></div><span class="pill" id="brain-status">A aguardar</span></div>
+          <div class="metric-inline"><span>Motor de decisão</span><strong>BFS · caminho mais curto</strong></div>
+          <div class="metric-inline"><span>Dispositivo</span><strong>Browser local</strong></div>
+          <div class="metric-inline"><span>Android Cloud</span><strong>Desligado</strong></div>
+          <div class="separator"></div>
+          <h3 style="font-size:13px">Registo de atividade</h3>
+          <div id="agent-log" class="log" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="ledger" aria-labelledby="ledger-title">
+      <div class="section-heading"><div><h2 id="ledger-title">Histórico financeiro</h2><p>Registos fictícios usados para testar o cálculo, a tabela e o gráfico.</p></div><button type="button" class="btn" id="export-csv">Exportar exemplo CSV</button></div>
+      <article class="card table-wrap"><table><thead><tr><th>Data</th><th>Origem</th><th>Tipo</th><th>Estado</th><th>Valor</th></tr></thead><tbody id="ledger-rows"></tbody></table></article>
+    </section>
+    <footer class="foot">NEXO Game Agent v0.1 · Protótipo público com dados inventados · Nenhum pagamento, anúncio ou conta real é consultado. O futuro registo financeiro real deve funcionar apenas numa área autenticada, com armazenamento seguro.</footer>
+  </main>
+  <script src="./app.mjs" type="module"></script>
+</body>
+</html>
